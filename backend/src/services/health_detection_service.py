@@ -14,7 +14,7 @@ from typing import Optional, Dict, Any
 from enum import Enum
 import os
 
-from backend.src.models.db_models import Project
+from src.models.db_models import Project
 
 
 class HealthStatus(str, Enum):

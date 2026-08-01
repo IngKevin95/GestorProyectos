@@ -1,5 +1,5 @@
 """
-Router de Proyectos: CRUD + state machine + EVM consolidado.
+Router de Proyectos: CRUD + health detection.
 """
 import uuid
 
@@ -10,15 +10,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.database import get_db
 from src.core.dependencies import get_current_user
 from src.core.exceptions import ConflictError, ForbiddenError, InvalidStateTransitionError, NotFoundError, ProjectPausedError
-from src.models.db_models import Activity, AuditLog, Department, Phase, Project
+from src.models.db_models import AuditLog, Project
 from src.models.schemas import (
     VALID_TRANSITIONS,
-    EVMResponse,
     ProjectCreate,
     ProjectResponse,
     ProjectUpdate,
 )
-from src.services.evm_calculator import ActivityInput, consolidate_evm
 from src.services.health_detection_service import HealthDetectionService
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
@@ -27,21 +25,6 @@ router = APIRouter(prefix="/projects", tags=["Projects"])
 def _check_rls(project: Project, user_id: str) -> None:
     if str(project.user_id) != user_id:
         raise ForbiddenError("You do not own this project")
-
-
-async def _get_all_activities(db: AsyncSession, project_id: uuid.UUID) -> list[ActivityInput]:
-    """Recopila todas las actividades activas de un proyecto para consolidación EVM."""
-    stmt = (
-        select(Activity)
-        .join(Department, Activity.department_id == Department.id)
-        .join(Phase, Department.phase_id == Phase.id)
-        .where(Phase.project_id == project_id, Activity.deleted_at == None, Phase.deleted_at == None, Department.deleted_at == None)
-    )
-    result = await db.execute(stmt)
-    return [
-        ActivityInput(a.bac, a.percentage_planned, a.percentage_completed, a.actual_cost)
-        for a in result.scalars().all()
-    ]
 
 
 @router.post("", response_model=ProjectResponse, status_code=201)
@@ -127,7 +110,7 @@ async def list_projects(
     }
 
 
-@router.get("/{project_id}", response_model=dict)
+@router.get("/{project_id}", response_model=ProjectResponse)
 async def get_project(
     project_id: uuid.UUID,
     current_user: dict = Depends(get_current_user),
@@ -139,10 +122,7 @@ async def get_project(
         raise NotFoundError("Project", str(project_id))
     _check_rls(project, current_user["user_id"])
 
-    activities = await _get_all_activities(db, project_id)
-    evm = consolidate_evm(activities)
-
-    return {"project": ProjectResponse.model_validate(project), "evm": EVMResponse(**evm.__dict__)}
+    return ProjectResponse.model_validate(project)
 
 
 @router.put("/{project_id}", response_model=ProjectResponse)
@@ -227,24 +207,6 @@ async def delete_project(
     await db.commit()
 
 
-@router.get("/{project_id}/evm", response_model=EVMResponse)
-async def get_project_evm(
-    project_id: uuid.UUID,
-    as_of: str | None = Query(None, description="ISO datetime for point-in-time query"),
-    current_user: dict = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    result = await db.execute(select(Project).where(Project.id == project_id, Project.deleted_at == None))
-    project = result.scalar_one_or_none()
-    if not project:
-        raise NotFoundError("Project", str(project_id))
-    _check_rls(project, current_user["user_id"])
-
-    activities = await _get_all_activities(db, project_id)
-    evm = consolidate_evm(activities)
-    return EVMResponse(**evm.__dict__)
-
-
 @router.get("/{project_id}/health", response_model=dict)
 async def get_project_health(
     project_id: uuid.UUID,
@@ -252,11 +214,10 @@ async def get_project_health(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Evaluate and return project health status (EP-002).
+    Evaluate and return project health status (EP-002, simplified without Tasks).
 
     Health classification rules:
-    - BLOCKED: Has blockers OR overdue_tasks >= 3
-    - AT_RISK: target_date <= 7 days AND open_tasks > 0
+    - BLOCKED: Has blockers field populated
     - NO_NEXT_STEP: siguiente_paso is empty or whitespace
     - OK: None of the above
     """
@@ -266,8 +227,7 @@ async def get_project_health(
         raise NotFoundError("Project", str(project_id))
     _check_rls(project, current_user["user_id"])
 
-    # Evaluate health (placeholder: no task integration yet)
-    # TODO: Query overdue_tasks and open_tasks from Tasks table once EP-004 is complete
+    # Simplified health detection (no Activity/Phase/Department queries)
     health_result = HealthDetectionService.detect_health(project, overdue_tasks_count=0, open_tasks_count=0)
 
     return {
