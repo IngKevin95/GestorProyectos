@@ -1,7 +1,7 @@
 /**
  * ProjectDetailPage — Full project view with tasks and audit.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useProjectStore } from "../store/projectStore";
 import { Layout } from "../components/Layout";
@@ -10,6 +10,10 @@ import { RoleGuard } from "../components/auth";
 import { StateBadge } from "../components/ui/StatusBadge";
 import { Modal, ConfirmDialog, showToast } from "../components/ui";
 import { ProjectForm } from "../components/ProjectForm";
+import TaskList from "../components/TaskList";
+import TaskFormModal from "../components/TaskFormModal";
+import { useTaskStore } from "../store/taskStore";
+import { taskService } from "../services/taskService";
 import { useT } from "../hooks/useT";
 import type { ProjectState } from "../types";
 import { VALID_TRANSITIONS } from "../types";
@@ -26,13 +30,28 @@ export function ProjectDetailPage() {
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [showStateChange, setShowStateChange] = useState(false);
+  const [showTaskForm, setShowTaskForm] = useState(false);
+  const [editingTask, setEditingTask] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<TabId>("tasks");
+
+  const { tasks, setTasks } = useTaskStore();
+
+  const loadTasks = useCallback(async () => {
+    if (!id) return;
+    try {
+      const data = await taskService.getTasks(id);
+      setTasks(data);
+    } catch (e) {
+      console.error("Error loading tasks", e);
+    }
+  }, [id, setTasks]);
 
   useEffect(() => {
     if (id) {
       fetchProject(id);
+      loadTasks();
     }
-  }, [id, fetchProject]);
+  }, [id, fetchProject, loadTasks]);
 
   const handleDelete = async () => {
     if (!selectedProject) return;
@@ -81,11 +100,11 @@ export function ProjectDetailPage() {
         <div className="bg-white rounded-xl shadow p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-bold text-gray-900">{project.name}</h1>
-              <StateBadge state={project.state} />
+              <h1 className="text-2xl font-bold text-gray-900">{project.name || "Proyecto Sin Nombre"}</h1>
+              <StateBadge state={project.state as any} />
             </div>
             <p className="text-sm text-gray-500 mt-1">
-              {t("project.created")} {new Date(project.created_at).toLocaleDateString()}
+              {t("project.created")} {project.created_at ? new Date(project.created_at).toLocaleDateString() : "\u2014"}
             </p>
           </div>
           <div className="flex gap-2 flex-wrap">
@@ -113,8 +132,15 @@ export function ProjectDetailPage() {
           </div>
         </div>
 
-        {/* Tabs — solo se muestra Auditoría hasta que Tareas esté disponible */}
+        {/* Tabs */}
         <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
+          <button
+            type="button"
+            onClick={() => setActiveTab("tasks")}
+            className={`px-4 py-2 text-sm rounded-lg font-semibold transition-all ${activeTab === "tasks" ? "bg-white shadow-sm text-indigo-700" : "text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"}`}
+          >
+            Tareas
+          </button>
           <button
             type="button"
             onClick={() => setActiveTab("audit")}
@@ -125,12 +151,78 @@ export function ProjectDetailPage() {
         </div>
 
         {/* Tab content */}
+        {activeTab === "tasks" && (
+          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Tareas del Proyecto</h3>
+              <button
+                onClick={() => {
+                  setEditingTask(null);
+                  setShowTaskForm(true);
+                }}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium"
+              >
+                + Nueva Tarea
+              </button>
+            </div>
+            <TaskList
+              projectId={project.id}
+              tasks={tasks}
+              onStatusChange={async (taskId, newStatus, version) => {
+                try {
+                  await taskService.updateTask(project.id, taskId, { status: newStatus as any, version });
+                  loadTasks();
+                  fetchProject(project.id);
+                } catch (e) {
+                  showToast("Error al actualizar tarea", "error");
+                }
+              }}
+              onEdit={(task) => {
+                setEditingTask(task);
+                setShowTaskForm(true);
+              }}
+              onDelete={async (taskId) => {
+                if (window.confirm("¿Eliminar esta tarea?")) {
+                  try {
+                    await taskService.deleteTask(project.id, taskId);
+                    loadTasks();
+                    fetchProject(project.id);
+                  } catch (e) {
+                    showToast("Error al eliminar", "error");
+                  }
+                }
+              }}
+            />
+          </div>
+        )}
+
         {activeTab === "audit" && (
           <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
             <AuditTrail projectId={project.id} />
           </div>
         )}
       </div>
+
+      <TaskFormModal
+        isOpen={showTaskForm}
+        onClose={() => setShowTaskForm(false)}
+        projectId={project.id}
+        task={editingTask}
+        onSave={async (taskData) => {
+          try {
+            if (editingTask) {
+              await taskService.updateTask(project.id, editingTask.id, { ...taskData, version: editingTask.version });
+            } else {
+              await taskService.createTask(project.id, taskData);
+            }
+            loadTasks();
+            fetchProject(project.id);
+          } catch (e) {
+            console.error(e);
+            throw e;
+          }
+        }}
+      />
 
       {/* Edit Modal */}
       {showEdit && (

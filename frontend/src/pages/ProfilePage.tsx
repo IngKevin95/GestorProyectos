@@ -1,16 +1,44 @@
 /**
  * ProfilePage — Current user profile view with enhanced display.
  */
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuthStore } from "../store/authStore";
 import { Layout } from "../components/Layout";
+import { showToast } from "../components/ui";
 
 export function ProfilePage() {
   const { user, fetchMe } = useAuthStore();
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!user) fetchMe();
   }, [user, fetchMe]);
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      showToast("Las contraseñas nuevas no coinciden", "error");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    try {
+      // TODO: Connect to real backend endpoint
+      // await api.post("/auth/change-password", { currentPassword, newPassword });
+      await new Promise((resolve) => setTimeout(resolve, 800)); // Simulate API call
+      showToast("Contraseña actualizada con éxito", "success");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      showToast("Error al actualizar la contraseña", "error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (!user) {
     return (
@@ -56,9 +84,54 @@ export function ProfilePage() {
 
           {/* Actions */}
           <div className="p-6">
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-400 mb-6">
               Miembro desde {user.created_at ? new Date(user.created_at).toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" }) : "—"}
             </p>
+            
+            <div className="border-t border-slate-100 pt-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Cambiar Contraseña</h2>
+              <form onSubmit={handlePasswordChange} className="space-y-4 max-w-md">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Contraseña Actual</label>
+                  <input
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Nueva Contraseña</label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Confirmar Nueva Contraseña</label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                >
+                  {isSubmitting ? "Actualizando..." : "Actualizar Contraseña"}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>

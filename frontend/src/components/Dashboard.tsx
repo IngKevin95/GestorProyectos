@@ -13,7 +13,7 @@ import { useT } from "../hooks/useT";
 import { HealthBadge, StateBadge } from "./StatusBadge";
 
 /* ── Mapeo de estado para Score KPI ── */
-const SCORE_MAX = 100;
+const SCORE_MAX = 1.0;
 
 export function Dashboard() {
   const { projects, selectedProject, fetchProjects, fetchProject, createProject, deleteProject, isLoading } = useProjectStore();

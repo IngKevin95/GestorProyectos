@@ -29,6 +29,10 @@ function NavItems({ t }: Readonly<NavItemsProps>) {
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
         Proyectos
       </NavLink>
+      <NavLink to="/tasks" className={navLinkClass}>
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        Tareas
+      </NavLink>
       <NavLink to="/admin" className={navLinkClass}>
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
         {t("nav.admin")}
@@ -128,9 +132,16 @@ export function Layout({ children }: Readonly<LayoutProps>) {
                     </p>
                   </div>
                   
-                  {/* Información del usuario en mobile */}
-
+                  {/* Menú de usuario */}
                   <div className="px-2">
+                    <Link
+                      to="/profile"
+                      className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-50 hover:text-indigo-600 font-medium transition-colors flex items-center gap-3"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                      Mi Perfil
+                    </Link>
                     <button
                       type="button"
                       className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-red-50 hover:text-red-600 font-medium transition-colors flex items-center gap-3 mt-1"

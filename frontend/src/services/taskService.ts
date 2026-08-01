@@ -2,54 +2,41 @@
  * Task API service for EP-004
  */
 import { Task } from "../store/taskStore";
+import api from "./api";
 
-const API_BASE = "/api/v1/projects";
+const API_BASE = "/projects";
 
 export const taskService = {
   async createTask(projectId: string, taskData: Partial<Task>) {
-    const response = await fetch(`${API_BASE}/${projectId}/tasks`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(taskData),
-    });
-    if (!response.ok) throw new Error("Failed to create task");
-    return response.json();
+    const { data } = await api.post(`${API_BASE}/${projectId}/tasks`, taskData);
+    return data;
   },
 
   async getTasks(projectId: string, status?: string) {
-    const url = new URL(`${API_BASE}/${projectId}/tasks`, window.location.origin);
-    if (status) url.searchParams.set("status", status);
-    const response = await fetch(url.toString());
-    if (!response.ok) throw new Error("Failed to fetch tasks");
-    const data = await response.json();
-    return data.tasks || [];
+    const params = status ? { status } : undefined;
+    const { data } = await api.get(`${API_BASE}/${projectId}/tasks`, { params });
+    // Assuming backend returns { tasks: [] } or just []
+    return data.tasks || data || [];
   },
 
   async getTask(projectId: string, taskId: string) {
-    const response = await fetch(`${API_BASE}/${projectId}/tasks/${taskId}`);
-    if (!response.ok) throw new Error("Failed to fetch task");
-    return response.json();
+    const { data } = await api.get(`${API_BASE}/${projectId}/tasks/${taskId}`);
+    return data;
   },
 
   async updateTask(projectId: string, taskId: string, taskData: Partial<Task>) {
-    const response = await fetch(`${API_BASE}/${projectId}/tasks/${taskId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(taskData),
-    });
-    if (!response.ok) {
-      if (response.status === 409) {
+    try {
+      const { data } = await api.put(`${API_BASE}/${projectId}/tasks/${taskId}`, taskData);
+      return data;
+    } catch (error: any) {
+      if (error.response?.status === 409) {
         throw new Error("Version conflict: task was modified by another user");
       }
-      throw new Error("Failed to update task");
+      throw error;
     }
-    return response.json();
   },
 
   async deleteTask(projectId: string, taskId: string) {
-    const response = await fetch(`${API_BASE}/${projectId}/tasks/${taskId}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) throw new Error("Failed to delete task");
+    await api.delete(`${API_BASE}/${projectId}/tasks/${taskId}`);
   },
 };
