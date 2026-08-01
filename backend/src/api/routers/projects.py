@@ -100,13 +100,14 @@ async def list_projects(
 
     result = await db.execute(stmt)
     items = list(result.scalars().all())
-    
+
     # Calculate scores (EP-003)
     for p in items:
         p.score = PriorityScoringService.calculate_score(p)
-        
-    # Sort descending by score, then by name for deterministic tie-breaking
-    items.sort(key=lambda x: (x.score, x.name), reverse=True)
+
+    # Sort descending by score, then by name (A->Z) for deterministic tie-breaking
+    # Using negative score for descending, name ascending for tiebreak
+    items.sort(key=lambda x: (-x.score, x.name))
     
     # In-memory cursor pagination
     if cursor:
