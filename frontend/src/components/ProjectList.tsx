@@ -194,7 +194,7 @@ export function ProjectList({
                       )}
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-600">
-                      {project.fecha_límite ? new Date(project.fecha_límite).toLocaleDateString("es-ES") : "-"}
+                      {project.fecha_limite ? new Date(project.fecha_limite).toLocaleDateString("es-ES") : "-"}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-2 justify-center">
