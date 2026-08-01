@@ -36,7 +36,8 @@ export function ProjectsPage() {
   };
 
   const handleEditProject = (id: string) => {
-    const project = projects.find((p) => p.id === id);
+    const safeProjects = projects || [];
+    const project = safeProjects.find((p) => p.id === id);
     if (project) {
       setEditingProject(project);
       setShowEditForm(true);
@@ -63,7 +64,8 @@ export function ProjectsPage() {
   };
 
   const handleInlineEdit = async (id: string, field: string, value: string) => {
-    const project = projects.find((p) => p.id === id);
+    const safeProjects = projects || [];
+    const project = safeProjects.find((p) => p.id === id);
     if (project) {
       await updateProject(id, { ...project, [field]: value });
       await fetchProjects(filters);
@@ -90,7 +92,7 @@ export function ProjectsPage() {
           </div>
         ) : (
           <ProjectList
-            projects={projects}
+            projects={projects || []}
             isLoading={isLoading}
             filters={filters}
             onFilterChange={setFilters}

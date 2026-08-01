@@ -34,7 +34,8 @@ export function ProjectList({
     onFilterChange?.(newFilters);
   };
 
-  const responsables = Array.from(new Set(projects.map((p) => p.responsable))).sort();
+  const safeProjects = projects || [];
+  const responsables = Array.from(new Set(safeProjects.map((p) => p.responsable))).sort();
 
   const handleDelete = async (id: string) => {
     try {
@@ -115,7 +116,7 @@ export function ProjectList({
 
       {/* Tabla de proyectos */}
       <div className="bg-white rounded-lg shadow-sm border border-slate-100 overflow-hidden">
-        {projects.length === 0 ? (
+        {safeProjects.length === 0 ? (
           <div className="p-8 text-center">
             <p className="text-slate-400 text-sm font-medium">No hay proyectos que coincidan con el filtro</p>
             {onCreateNew && (
@@ -141,7 +142,7 @@ export function ProjectList({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {projects.map((project) => (
+                {safeProjects.map((project) => (
                   <tr key={project.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4 text-sm font-medium text-slate-900">{project.name}</td>
                     <td className="px-6 py-4 text-sm text-slate-600">{project.responsable}</td>
