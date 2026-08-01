@@ -245,6 +245,7 @@ docs/.arch-suggestions.md
 .claude/*
 .agents/
 .claudeignore
+openspec/
 node_modules/
 package.json
 package-lock.json
@@ -257,7 +258,15 @@ INTEGRACION_POWER_TOOLS.md
 CREAR_NUEVAS_SKILLS.md
 CLAUDE.md
 
-# docs: solo el PRD queda trackeado, el resto (datasets, enunciado, estado de flujo) se ignora
-# docs/*
+# docs: solo artefactos de proyecto quedan trackeados
+# Ignorar: datasets, enunciado, estado de flujo, reportes antiguos
+docs/00-requirements/
+docs/.flow-state.json
+docs/.factory-suggestions.md
+# Keep only latest audit reports (20260801-*.md)
+docs/.reviews/20260731-*.md
+docs/.reviews/202607312*.md
+docs/.reviews/20260801-0*.md
+docs/.reviews/20260801-1*.md
+docs/.reviews/20260801-2*.md
 # ── /Fabrica Agentica ──
-docs/00-requirements/Enunciado — Reto Desarrollador de Soluciones con IA _ Aztec.md
