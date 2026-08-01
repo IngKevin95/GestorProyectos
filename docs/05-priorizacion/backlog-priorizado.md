@@ -6,95 +6,106 @@ fecha: 2026-08-01
 
 # Backlog — GestorProyectos
 
-Tabla consolidada de todas las Historias de Usuario, ordenadas por priorización vigente (Must > Should > Could) y luego por épica.
+Tabla consolidada de todas las Historias de Usuario, agrupadas por **Épica** y ordenadas según su prioridad bajo la metodología MoSCoW. 
 
-## Priorización
+## Metodología de Priorización: MoSCoW (A nivel de Épica)
 
-| Prioridad | Cantidad | Notas |
-|-----------|----------|-------|
-| **Must** | 22 | Core producto y cimientos técnicos |
-| **Should** | 4 | Enhancers de UX y administración secundaria |
-| **Could** | 1 | Integraciones futuras (webhooks) |
-| **TOTAL** | 27 | |
+Se ha priorizado a nivel de **Épica**, determinando cuáles flujos completos (y sus historias) forman parte del MVP y cuáles se iterarán posteriormente:
+
+- **Must / Should (Requeridas):** Épicas 1, 2, 3, 4 y 6. Conforman el core operativo de la herramienta (gestión de proyectos, tareas, salud, cartera y autenticación).
+- **Could / Won't (Opcionales/Diferidas):** Épicas 5, 7, 8 y 9. Aportan valor adicional (auditoría, datos semilla, webhooks, equipo) pero no bloquean la funcionalidad principal de la primera entrega.
 
 ---
 
-## Historias por Prioridad
+## Épicas Requeridas (MVP)
 
-### MUST (22 historias)
+### MUST HAVE (Core Indispensable)
+* **Justificación de Negocio:** Estas épicas sientan las bases de la plataforma. Sin creación de proyectos, detección de salud y tareas, el producto carece de valor fundamental.
 
-| ID | Título | Épica | Complejidad | Estado | Fuente |
-|---|---|---|---|---|---|
-| HU-001 | Crear y actualizar proyectos | EP-001 | M | borrador | PRD §6 |
-| HU-002 | Consultar proyecto individual | EP-001 | S | borrador | PRD §6 |
-| HU-003 | Listar proyectos de la cartera | EP-001 | S | borrador | PRD §6 |
-| HU-004 | Detectar proyectos bloqueados | EP-002 | M | borrador | PRD §5 |
-| HU-005 | Detectar proyectos en riesgo | EP-002 | M | borrador | PRD §5 |
-| HU-006 | Detectar proyectos sin rumbo | EP-002 | M | borrador | PRD §5 |
-| HU-007 | Vista de cartera con badges de salud | EP-003 | M | borrador | PRD §5 |
-| HU-008 | Ordenar cartera por score de priorización | EP-003 | M | borrador | PRD §5 |
-| HU-009 | Configurar estrategia de priorización por proyecto | EP-003 | M | borrador | PRD §6 |
-| HU-010 | Crear y editar tareas de proyecto | EP-004 | M | borrador | PRD §6 |
-| HU-011 | Filtrar tareas por estado | EP-004 | S | borrador | PRD §6 |
-| HU-012 | Cargar proyectos desde CSV (semilla) | EP-005 | S | borrador | PRD §6 |
-| HU-013 | Cargar tareas desde CSV (semilla) | EP-005 | S | borrador | PRD §6 |
-| HU-014 | Cargar equipo desde CSV (semilla) | EP-005 | S | borrador | PRD §6 |
-| HU-015 | Autenticación JWT | EP-006 | M | borrador | PRD §10 |
-| HU-020 | Eliminar proyecto (soft delete) | EP-001 | S | borrador | PRD §6 |
-| HU-022 | Edición inline de proyectos en el tablero | EP-001 | M | borrador | PRD §6 |
-| HU-023 | Visualizar y entender criterio de priorización | EP-003 | M | borrador | PRD §5 |
-| HU-024 | Configurar PostgreSQL 15 en docker-compose | EP-001 | S | borrador | PRD §10 |
-| HU-025 | Configurar FastAPI backend en docker-compose | EP-001 | M | borrador | PRD §10 |
-| HU-026 | Configurar React frontend en docker-compose | EP-003 | M | borrador | PRD §10 |
-| HU-027 | Orquestar stack completo en docker-compose | EP-001 | M | borrador | PRD §12 |
+**EP-001: Gestión de Proyectos y Contenedorización**
+| ID | Título | Complejidad | Estado |
+|---|---|---|---|
+| HU-001 | Crear y actualizar proyectos | M | lista |
+| HU-002 | Consultar proyecto individual | S | lista |
+| HU-003 | Listar proyectos de la cartera | S | lista |
+| HU-020 | Eliminar proyecto (soft delete) | S | lista |
+| HU-022 | Edición inline de proyectos en el tablero | M | lista |
+| HU-024 | Configurar PostgreSQL 15 en docker-compose | S | lista |
+| HU-025 | Configurar FastAPI backend en docker-compose | M | lista |
+| HU-027 | Orquestar stack completo en docker-compose | M | lista |
 
-### SHOULD (4 historias)
+**EP-002: Motor de Detección de Salud**
+| ID | Título | Complejidad | Estado |
+|---|---|---|---|
+| HU-004 | Detectar proyectos bloqueados | M | lista |
+| HU-005 | Detectar proyectos en riesgo | M | lista |
+| HU-006 | Detectar proyectos sin rumbo | M | lista |
 
-| ID | Título | Épica | Complejidad | Estado | Fuente |
-|---|---|---|---|---|---|
-| HU-016 | Gestión de usuarios y roles (administración) | EP-006 | M | borrador | PRD §5 |
-| HU-017 | Audit Trail (historial de cambios) | EP-007 | M | borrador | PRD §5 |
-| HU-018 | Vista de carga de equipo (Team Capacity) | EP-008 | M | borrador | PRD §5 |
-| HU-019 | Gestión de plantillas de proyectos | EP-007 | M | borrador | PRD §5 |
+**EP-004: Gestión de Tareas**
+| ID | Título | Complejidad | Estado |
+|---|---|---|---|
+| HU-010 | Crear y editar tareas de proyecto | M | lista |
+| HU-011 | Filtrar tareas por estado | S | lista |
 
-### COULD (1 historia)
 
-| ID | Título | Épica | Complejidad | Estado | Fuente |
-|---|---|---|---|---|---|
-| HU-021 | Notificaciones vía Webhooks | EP-009 | M | borrador | PRD §5 |
+### SHOULD HAVE (Altamente Recomendables)
+* **Justificación de Negocio:** Completan la experiencia del MVP, aportando autenticación y visibilidad global (Cartera), lo que permite que el sistema se pueda probar de forma realista con múltiples usuarios.
 
----
+**EP-003: Visibilidad de Cartera**
+| ID | Título | Complejidad | Estado |
+|---|---|---|---|
+| HU-007 | Vista de cartera con badges de salud | M | lista |
+| HU-008 | Ordenar cartera por score de priorización | M | lista |
+| HU-009 | Configurar estrategia de priorización por proyecto | M | lista |
+| HU-023 | Visualizar y entender criterio de priorización | M | lista |
+| HU-026 | Configurar React frontend en docker-compose | M | lista |
 
-## Huérfanos
-
-- **Historias sin épica**: Ninguna (todas están asignadas).
-- **Épicas con historias**: EP-001 (8), EP-002 (3), EP-003 (5), EP-004 (2), EP-005 (3), EP-006 (2), EP-007 (2), EP-008 (1), EP-009 (1).
+**EP-006: Autenticación y Usuarios**
+| ID | Título | Complejidad | Estado |
+|---|---|---|---|
+| HU-015 | Autenticación JWT | M | lista |
+| HU-016 | Gestión de usuarios y roles (administración) | M | lista |
 
 ---
 
-## Resumen de Cobertura
+## Épicas Opcionales y Diferidas
 
-| Épica | Historias | Must | Should | Could |
-|---|---|---|---|---|
-| EP-001 (CRUD+Docker) | 8 | 7 | 1 | — |
-| EP-002 (Motor Salud) | 3 | 3 | — | — |
-| EP-003 (Cartera+Docker) | 5 | 5 | — | — |
-| EP-004 (Tareas) | 2 | 2 | — | — |
-| EP-005 (Datos Semilla) | 3 | 3 | — | — |
-| EP-006 (Auth) | 2 | 1 | 1 | — |
-| EP-007 (Auditoría) | 2 | — | 2 | — |
-| EP-008 (Equipo) | 1 | — | 1 | — |
-| EP-009 (Webhooks) | 1 | — | — | 1 |
-| **TOTAL** | **27** | **22** | **4** | **1** |
+### COULD HAVE (Deseables si hay capacidad)
+* **Justificación de Negocio:** Facilitan la implementación (datos semilla) o la trazabilidad (auditoría), pero el producto puede funcionar operativamente sin ellas en las primeras semanas de vida.
 
-> **Nota sobre Docker**: HU-024, HU-025, HU-027 reasignadas a EP-001 (infraestructura integrada desde el CRUD). HU-026 reasignada a EP-003 (frontend dockerizado). No hay épica EP-010 independiente.
+**EP-005: Datos Semilla**
+| ID | Título | Complejidad | Estado |
+|---|---|---|---|
+| HU-012 | Cargar proyectos desde CSV (semilla) | S | lista |
+| HU-013 | Cargar tareas desde CSV (semilla) | S | lista |
+| HU-014 | Cargar equipo desde CSV (semilla) | S | lista |
+
+**EP-007: Auditoría y Plantillas**
+| ID | Título | Complejidad | Estado |
+|---|---|---|---|
+| HU-017 | Audit Trail (historial de cambios) | M | lista |
+| HU-019 | Gestión de plantillas de proyectos | M | lista |
+
+
+### WON'T HAVE (Diferidas para futuras versiones)
+* **Justificación de por qué NO se incluyeron en el MVP:** Para lanzar rápido, el manejo de la capacidad del equipo (Capacity) y las notificaciones por webhooks (Slack/Teams) se consideran complejas y propias de un producto de madurez media/alta, por lo que se postergan explícitamente.
+
+**EP-008: Gestión de Capacidad de Equipo**
+| ID | Título | Complejidad | Estado |
+|---|---|---|---|
+| HU-018 | Vista de carga de equipo (Team Capacity) | M | lista |
+
+**EP-009: Integraciones y Webhooks**
+| ID | Título | Complejidad | Estado |
+|---|---|---|---|
+| HU-021 | Notificaciones vía Webhooks | M | lista |
 
 ---
 
 ## Leyenda de Estado
 
 - `borrador` — Historia escrita pero no validada contra INVEST aún.
-- `lista` — Aprobada por INVEST, lista para construcción.
+- `lista` — Aprobada por INVEST, lista para construcción (Todas las HUs se encuentran en este estado).
 - `en_construccion` — Asignada a un slice activo.
 - `completada` — Implementada y verificada en smoke.
 - `cancelada` — Descartada o subsumida por otra.
