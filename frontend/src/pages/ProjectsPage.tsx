@@ -4,7 +4,7 @@ import { Layout } from "../components/Layout";
 import { useProjectStore } from "../store/projectStore";
 import { ProjectForm } from "../components/ProjectForm";
 import { ProjectList } from "../components/ProjectList";
-import type { Project } from "../types";
+import type { Project, ProjectInput, ProjectUpdate } from "../types";
 
 export function ProjectsPage() {
   const {
@@ -29,7 +29,7 @@ export function ProjectsPage() {
     fetchProjects(filters);
   }, [filters, fetchProjects]);
 
-  const handleCreateProject = async (data: any) => {
+  const handleCreateProject = async (data: ProjectInput) => {
     await createProject(data);
     setShowCreateForm(false);
     await fetchProjects(filters);
@@ -44,7 +44,7 @@ export function ProjectsPage() {
     }
   };
 
-  const handleUpdateProject = async (data: any) => {
+  const handleUpdateProject = async (data: ProjectUpdate) => {
     if (editingProject) {
       await updateProject(editingProject.id, data);
       setShowEditForm(false);

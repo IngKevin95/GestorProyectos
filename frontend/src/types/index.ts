@@ -39,6 +39,25 @@ export interface Project {
   updated_at: string;
 }
 
+export interface ProjectInput {
+  name: string;
+  responsable: string;
+  estado: string;
+  prioridad: string;
+  fecha_limite?: string;
+  siguiente_paso?: string;
+  bloqueos?: string;
+  notas?: string;
+  tipo_proyecto: string;
+  priority_strategy?: string;
+  priority_constant?: number;
+  total_effort?: number;
+}
+
+export interface ProjectUpdate extends Partial<ProjectInput> {
+  version?: number;
+}
+
 export interface Phase {
   id: string;
   project_id: string;

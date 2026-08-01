@@ -3,7 +3,7 @@
  * Proyectos, KPI, loading states.
  */
 import { create } from "zustand";
-import type { Project, KPIIndicators } from "../types";
+import type { Project, KPIIndicators, ProjectInput, ProjectUpdate } from "../types";
 import * as svc from "../services/apiService";
 
 function extractError(e: unknown): string {
@@ -11,18 +11,7 @@ function extractError(e: unknown): string {
   return err?.response?.data?.detail?.message ?? "Unexpected error";
 }
 
-interface ProjectInput {
-  name: string;
-  responsable: string;
-  estado: string;
-  prioridad: string;
-  fecha_límite?: string;
-  siguiente_paso?: string;
-  bloqueos?: string;
-  notas?: string;
-  tipo_proyecto: string;
-  bac?: number;
-}
+
 
 interface ProjectState {
   projects: Project[];
@@ -38,7 +27,7 @@ interface ProjectState {
   fetchProjects: (filters?: { status?: string; responsable?: string }) => Promise<void>;
   fetchProject: (id: string) => Promise<void>;
   createProject: (data: ProjectInput) => Promise<Project>;
-  updateProject: (id: string, data: Partial<ProjectInput>) => Promise<void>;
+  updateProject: (id: string, data: ProjectUpdate) => Promise<void>;
   deleteProject: (id: string) => Promise<void>;
   fetchProjectKPI: (id: string) => Promise<void>;
   setFilters: (filters: { status?: string; responsable?: string }) => void;

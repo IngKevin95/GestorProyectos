@@ -72,7 +72,7 @@ export function ProjectForm({ open, project, onSubmit, onClose, isLoading }: Pro
     }
 
     try {
-      const payload: any = {
+      const payload: Record<string, any> = {
         name: formData.nombre,
         responsable: formData.responsable,
         estado: formData.estado,
