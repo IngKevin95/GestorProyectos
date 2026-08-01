@@ -25,7 +25,7 @@ docker-compose up -d
 The stack will be available at:
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
-- **API Docs**: http://localhost:8000/docs
+- **API Docs**: http://localhost:8000/api-docs
 - **PostgreSQL**: localhost:5432
 
 ### Stop the Stack
