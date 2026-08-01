@@ -221,8 +221,15 @@ class ProjectCreate(BaseModel):
     notas: Optional[str] = Field(None, max_length=5000)
     tipo_proyecto: Optional[ProjectType] = None
     priority_strategy: Optional[PriorityStrategy] = "relative"
-    priority_constant: Optional[float] = Field(0.0, ge=0)
-    business_value: Optional[float] = Field(0.0, ge=0)
+    priority_constant: Optional[float] = Field(0.0, ge=0, le=100)
+    business_value: Optional[float] = Field(0.0, ge=0, le=100)
+
+    @field_validator("priority_constant")
+    @classmethod
+    def validate_priority_constant(cls, v: float | None) -> float | None:
+        if v is not None and (v < 0 or v > 100):
+            raise ValueError("priority_constant must be between 0 and 100")
+        return v
 
 
 class ProjectUpdate(BaseModel):
@@ -238,9 +245,16 @@ class ProjectUpdate(BaseModel):
     notas: Optional[str] = Field(None, max_length=5000)
     tipo_proyecto: Optional[ProjectType] = None
     priority_strategy: Optional[PriorityStrategy] = None
-    priority_constant: Optional[float] = Field(None, ge=0)
-    business_value: Optional[float] = Field(None, ge=0)
+    priority_constant: Optional[float] = Field(None, ge=0, le=100)
+    business_value: Optional[float] = Field(None, ge=0, le=100)
     version: int
+
+    @field_validator("priority_constant")
+    @classmethod
+    def validate_priority_constant(cls, v: float | None) -> float | None:
+        if v is not None and (v < 0 or v > 100):
+            raise ValueError("priority_constant must be between 0 and 100")
+        return v
 
 
 class ProjectResponse(BaseModel):
@@ -249,7 +263,7 @@ class ProjectResponse(BaseModel):
     bac: float
     state: ProjectState
     responsable: str
-    estado: ProjectStatus
+    status: ProjectStatus
     prioridad: Optional[ProjectPriority] = None
     fecha_limite: Optional[date] = None
     siguiente_paso: Optional[str] = None
