@@ -50,7 +50,16 @@ export function ProjectForm({ open, project, onSubmit, onClose, isLoading }: Pro
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.nombre.trim()) newErrors.nombre = "El nombre es requerido";
+    if (formData.nombre.length > 255) newErrors.nombre = "El nombre es muy largo";
     if (!formData.responsable.trim()) newErrors.responsable = "El responsable es requerido";
+    if (!ESTADOS.includes(formData.estado)) newErrors.estado = "Estado inválido";
+    if (!PRIORIDADES.includes(formData.prioridad)) newErrors.prioridad = "Prioridad inválida";
+    if (!TIPOS.includes(formData.tipo_proyecto)) newErrors.tipo_proyecto = "Tipo de proyecto inválido";
+    
+    if (formData.fecha_limite) {
+      const isIso = /^\d{4}-\d{2}-\d{2}$/.test(formData.fecha_limite);
+      if (!isIso) newErrors.fecha_limite = "Formato de fecha inválido";
+    }
     return newErrors;
   };
 
