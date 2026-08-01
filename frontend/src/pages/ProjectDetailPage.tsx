@@ -1,33 +1,32 @@
 /**
- * ProjectDetailPage — Full project view with audit, data, and project details.
+ * ProjectDetailPage — Full project view with tasks and audit.
  */
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useProjectStore } from "../store/projectStore";
 import { Layout } from "../components/Layout";
 import { AuditTrail } from "../components/audit";
-import { DataImportExport } from "../components/data";
 import { RoleGuard } from "../components/auth";
 import { StateBadge } from "../components/ui/StatusBadge";
-import { Modal, FormField, ConfirmDialog, showToast, ScheduleBadge } from "../components/ui";
+import { Modal, ConfirmDialog, showToast } from "../components/ui";
+import { ProjectForm } from "../components/ProjectForm";
 import { useT } from "../hooks/useT";
 import type { ProjectState } from "../types";
 import { VALID_TRANSITIONS } from "../types";
-import { formatCurrency } from "../utils/format";
 
-type TabId = "audit" | "data";
+type TabId = "tasks" | "audit";
 
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const t = useT();
-  const { selectedProject, selectedKPI, isLoading, error, fetchProject, deleteProject } =
+  const { selectedProject, selectedKPI, isLoading, error, fetchProject, updateProject, deleteProject } =
     useProjectStore();
 
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [showStateChange, setShowStateChange] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabId>("audit");
+  const [activeTab, setActiveTab] = useState<TabId>("tasks");
 
   useEffect(() => {
     if (id) {
@@ -86,15 +85,6 @@ export function ProjectDetailPage() {
               <StateBadge state={project.state} />
             </div>
             <p className="text-sm text-gray-500 mt-1">
-              {t("project.bac")}: <strong>{formatCurrency(project.bac)}</strong>
-              {selectedKPI && (
-                <>
-                  <span className="mx-2">·</span>
-                  {t("kpi.actual_cost")}: <strong>{formatCurrency(selectedKPI.ac)}</strong>
-                  <span className="ml-2"><ScheduleBadge status={selectedKPI.ac_status} label={t("kpi.ac_vs_bac")} /></span>
-                </>
-              )}
-              <span className="mx-2">·</span>
               {t("project.created")} {new Date(project.created_at).toLocaleDateString()}
             </p>
           </div>
@@ -125,9 +115,9 @@ export function ProjectDetailPage() {
 
         {/* Tabs */}
         <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
-          {([ 
+          {([
+            ["tasks", "Tareas"],
             ["audit", t("project.audit")],
-            ["data", t("project.import_export")],
           ] satisfies [TabId, string][]).map(([tab, label]) => (
             <button
               key={tab}
@@ -141,22 +131,39 @@ export function ProjectDetailPage() {
         </div>
 
         {/* Tab content */}
-        {activeTab === "audit" && (
+        {activeTab === "tasks" && (
           <div className="bg-white rounded-xl shadow p-6">
-            <AuditTrail projectId={project.id} />
+            <div className="text-center py-12 text-slate-400">
+              <p className="text-sm">Gestión de tareas disponible próximamente</p>
+            </div>
           </div>
         )}
 
-        {activeTab === "data" && (
+        {activeTab === "audit" && (
           <div className="bg-white rounded-xl shadow p-6">
-            <DataImportExport projectId={project.id} onImported={() => { if (id) fetchProject(id); }} />
+            <AuditTrail projectId={project.id} />
           </div>
         )}
       </div>
 
       {/* Edit Modal */}
       {showEdit && (
-        <EditProjectModal project={project} onClose={() => setShowEdit(false)} onSaved={() => { setShowEdit(false); if (id) fetchProject(id); }} />
+        <ProjectForm
+          open
+          project={project}
+          onClose={() => setShowEdit(false)}
+          onSubmit={async (data) => {
+            try {
+              await updateProject(project.id, { ...data, version: project.version });
+              showToast("Proyecto actualizado", "success");
+              setShowEdit(false);
+              if (id) fetchProject(id);
+            } catch (err: any) {
+              showToast(err?.response?.data?.detail?.message ?? "Error al actualizar", "error");
+            }
+          }}
+          isLoading={isLoading}
+        />
       )}
 
       {/* State Change Modal */}
@@ -167,43 +174,6 @@ export function ProjectDetailPage() {
       {/* Delete Confirm */}
       <ConfirmDialog open={showDelete} onClose={() => setShowDelete(false)} onConfirm={handleDelete} title={t("action.delete")} message={`${t("action.delete")} "${project.name}"?`} confirmLabel={t("action.delete")} isDestructive />
     </Layout>
-  );
-}
-
-/* ── Edit Project Modal ────────────────────────── */
-
-function EditProjectModal({ project, onClose, onSaved }: Readonly<{ project: { id: string; name: string; bac: number; version: number }; onClose: () => void; onSaved: () => void }>) {
-  const { updateProject } = useProjectStore();
-  const t = useT();
-  const [name, setName] = useState(project.name);
-  const [bac, setBac] = useState(project.bac.toString());
-  const [saving, setSaving] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      await updateProject(project.id, { name: name.trim(), bac: Number(bac), version: project.version });
-      showToast("Project updated", "success");
-      onSaved();
-    } catch {
-      showToast("Failed to update project", "error");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <Modal open onClose={onClose} title={t("project.edit_title")}>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <FormField label="Name" name="editName" value={name} onChange={(e) => setName(e.target.value)} required />
-        <FormField label="Budget (BAC)" name="editBac" type="number" value={bac} onChange={(e) => setBac(e.target.value)} required min={1} step="0.01" />
-        <div className="flex justify-end gap-3 pt-2">
-          <button type="button" onClick={onClose} className="px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors">{t("action.cancel")}</button>
-          <button type="submit" disabled={saving} className="px-4 py-2.5 rounded-xl text-white text-sm font-bold disabled:opacity-60 bg-indigo-600 hover:bg-indigo-700 transition-all shadow-md shadow-indigo-500/20 hover:-translate-y-0.5 active:translate-y-0">{saving ? t("action.saving") : t("project.save")}</button>
-        </div>
-      </form>
-    </Modal>
   );
 }
 

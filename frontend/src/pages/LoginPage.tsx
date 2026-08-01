@@ -144,7 +144,7 @@ export function LoginPage() {
           </form>
 
           <p className="text-center text-xs text-gray-400 mt-8">
-            © {new Date().getFullYear()} Aztec
+            © {new Date().getFullYear()} Kevin Orduz
           </p>
         </div>
       </div>

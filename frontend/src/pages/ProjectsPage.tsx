@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { useProjectStore } from "../store/projectStore";
 import { ProjectForm } from "../components/ProjectForm";
 import { ProjectList } from "../components/ProjectList";
-import { ProjectDetail } from "../components/ProjectDetail";
 import type { Project } from "../types";
 
 export function ProjectsPage() {
@@ -20,18 +20,19 @@ export function ProjectsPage() {
     setFilters,
   } = useProjectStore();
 
+  const navigate = useNavigate();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
-  const [showDetail, setShowDetail] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
 
   useEffect(() => {
     fetchProjects(filters);
-  }, [filters]);
+  }, [filters, fetchProjects]);
 
   const handleCreateProject = async (data: any) => {
     await createProject(data);
     setShowCreateForm(false);
+    await fetchProjects(filters);
   };
 
   const handleEditProject = (id: string) => {
@@ -47,100 +48,77 @@ export function ProjectsPage() {
       await updateProject(editingProject.id, data);
       setShowEditForm(false);
       setEditingProject(null);
+      await fetchProjects(filters);
     }
-  };
-
-  const handleViewDetail = async (id: string) => {
-    await fetchProject(id);
-    setShowDetail(true);
   };
 
   const handleDeleteProject = async (id: string) => {
     await deleteProject(id);
+    await fetchProjects(filters);
+  };
+
+  const handleViewDetail = (id: string) => {
+    fetchProject(id);
+    navigate(`/projects/${id}`);
+  };
+
+  const handleInlineEdit = async (id: string, field: string, value: string) => {
+    const project = projects.find((p) => p.id === id);
+    if (project) {
+      await updateProject(id, { ...project, [field]: value });
+      await fetchProjects(filters);
+    }
   };
 
   return (
     <Layout>
-      {/* Header */}
-      <div className="mb-8">
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">Proyectos</h1>
-            <p className="text-slate-600 mt-1">Gestiona la cartera de proyectos</p>
-          </div>
+          <h1 className="text-3xl font-bold text-slate-900">Proyectos</h1>
           <button
-            onClick={() => {
-              setEditingProject(null);
-              setShowCreateForm(true);
-            }}
-            className="px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-all shadow-md shadow-indigo-500/20 hover:-translate-y-0.5 active:translate-y-0"
+            type="button"
+            className="px-6 py-3 rounded-xl text-white font-bold bg-indigo-600 hover:bg-indigo-700 transition-all shadow-md shadow-indigo-500/20 hover:-translate-y-0.5 active:translate-y-0"
+            onClick={() => setShowCreateForm(true)}
           >
-            + Crear Proyecto
+            Nuevo Proyecto
           </button>
         </div>
+
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="inline-block w-8 h-8 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: "#4f46e5", borderTopColor: "transparent" }} />
+          </div>
+        ) : (
+          <ProjectList
+            projects={projects}
+            isLoading={isLoading}
+            filters={filters}
+            onFilterChange={setFilters}
+            onViewDetail={handleViewDetail}
+            onEdit={handleEditProject}
+            onDelete={handleDeleteProject}
+            onCreateNew={() => setShowCreateForm(true)}
+            onInlineEdit={handleInlineEdit}
+          />
+        )}
+
+        <ProjectForm
+          open={showCreateForm}
+          onSubmit={handleCreateProject}
+          onClose={() => setShowCreateForm(false)}
+          isLoading={isLoading}
+        />
+
+        {editingProject && (
+          <ProjectForm
+            open={showEditForm}
+            project={editingProject}
+            onSubmit={handleUpdateProject}
+            onClose={() => { setShowEditForm(false); setEditingProject(null); }}
+            isLoading={isLoading}
+          />
+        )}
       </div>
-
-      {/* Proyecto List */}
-      <ProjectList
-        projects={projects}
-        isLoading={isLoading}
-        filters={filters}
-        onFilterChange={setFilters}
-        onViewDetail={handleViewDetail}
-        onEdit={handleEditProject}
-        onDelete={handleDeleteProject}
-        onCreateNew={() => {
-          setEditingProject(null);
-          setShowCreateForm(true);
-        }}
-        onInlineEdit={async (id, field, value) => {
-          const p = projects.find((proj) => proj.id === id);
-          if (p) {
-            await updateProject(id, { [field]: value, version: p.version || 1 });
-          }
-        }}
-      />
-
-      {/* Modales */}
-      <ProjectForm
-        open={showCreateForm}
-        project={showEditForm ? editingProject || undefined : undefined}
-        onSubmit={showEditForm ? handleUpdateProject : handleCreateProject}
-        onClose={() => {
-          setShowCreateForm(false);
-          setShowEditForm(false);
-          setEditingProject(null);
-        }}
-        isLoading={isLoading}
-      />
-
-      <ProjectForm
-        open={showEditForm}
-        project={editingProject || undefined}
-        onSubmit={handleUpdateProject}
-        onClose={() => {
-          setShowEditForm(false);
-          setEditingProject(null);
-        }}
-        isLoading={isLoading}
-      />
-
-      <ProjectDetail
-        isOpen={showDetail}
-        project={selectedProject}
-        isLoading={isLoading}
-        onClose={() => setShowDetail(false)}
-        onEdit={() => {
-          setShowDetail(false);
-          handleEditProject(selectedProject?.id || "");
-        }}
-        onDelete={async () => {
-          if (selectedProject) {
-            await handleDeleteProject(selectedProject.id);
-            setShowDetail(false);
-          }
-        }}
-      />
     </Layout>
   );
 }
