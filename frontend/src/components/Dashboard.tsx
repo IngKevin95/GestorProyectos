@@ -5,16 +5,14 @@ import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Layout } from "./Layout";
 import { useProjectStore } from "../store/projectStore";
-import { formatCurrency } from "../utils/format";
+import { ProjectForm } from "./ProjectForm";
 import * as svc from "../services/apiService";
-import type { ProjectTemplate } from "../types";
 import { useT } from "../hooks/useT";
 import { HealthBadge } from "./StatusBadge";
-import { PriorityPanel } from "./PriorityPanel";
 
 export function Dashboard() {
-  const { projects, selectedProject, fetchProjects, fetchProject, deleteProject, isLoading } = useProjectStore();
-  const [showCreate, setShowCreate] = useState(false);
+  const { projects, selectedProject, fetchProjects, fetchProject, createProject, deleteProject, isLoading } = useProjectStore();
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -77,18 +75,54 @@ export function Dashboard() {
         </div>
       </div>
 
+      {/* Global KPIs */}
+      {projects.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+            <p className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-2">Total</p>
+            <p className="text-3xl font-black text-slate-900">{projects.length}</p>
+            <p className="text-xs text-slate-500 mt-1">Proyectos</p>
+          </div>
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+            <p className="text-xs font-bold text-emerald-600 uppercase tracking-wide mb-2">Activos</p>
+            <p className="text-3xl font-black text-emerald-900">{projects.filter((p) => p.state === "ACTIVE").length}</p>
+            <p className="text-xs text-emerald-600 mt-1">En ejecución</p>
+          </div>
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+            <p className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-2">Completados</p>
+            <p className="text-3xl font-black text-slate-900">{projects.filter((p) => p.state === "COMPLETED").length}</p>
+            <p className="text-xs text-slate-500 mt-1">Finalizados</p>
+          </div>
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+            <p className="text-xs font-bold text-rose-600 uppercase tracking-wide mb-2">Promedio Score</p>
+            <p className="text-3xl font-black text-rose-900">
+              {(projects.reduce((sum, p) => sum + (p.score ?? 0), 0) / projects.length).toFixed(1)}
+            </p>
+            <p className="text-xs text-rose-600 mt-1">Priorización</p>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Project list */}
         <section className="lg:col-span-1 space-y-4">
           <div className="flex items-center justify-between bg-white px-5 py-4 rounded-2xl shadow-sm border border-slate-100">
             <h2 className="text-lg font-bold text-slate-800 tracking-tight">{t("dashboard.projects")}</h2>
-            <button
-              type="button"
-              className="text-sm px-4 py-2 rounded-xl text-white font-bold bg-indigo-600 hover:bg-indigo-700 transition-all shadow-md shadow-indigo-500/20 hover:-translate-y-0.5 active:translate-y-0"
-              onClick={() => setShowCreate(true)}
-            >
-              {t("dashboard.new")}
-            </button>
+            <div className="flex gap-2">
+              <Link
+                to="/projects"
+                className="text-sm px-4 py-2 rounded-xl text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-all font-bold"
+              >
+                Ver Todos
+              </Link>
+              <button
+                type="button"
+                className="text-sm px-4 py-2 rounded-xl text-white font-bold bg-indigo-600 hover:bg-indigo-700 transition-all shadow-md shadow-indigo-500/20 hover:-translate-y-0.5 active:translate-y-0"
+                onClick={() => setShowCreateForm(true)}
+              >
+                Nuevo
+              </button>
+            </div>
           </div>
           {isLoading && <p className="text-slate-400 text-sm px-2 font-medium">{t("dashboard.loading")}</p>}
           {!isLoading && projects.length === 0 && (
@@ -164,11 +198,7 @@ export function Dashboard() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-between text-sm text-slate-500 font-medium mt-2">
-                <div className="flex items-center gap-2">
-                  <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  BAC: {formatCurrency(project.bac)}
-                </div>
+              <div className="flex items-center justify-end text-sm text-slate-500 font-medium mt-2">
                 <div className="flex items-center gap-1 font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                   {project.score !== null ? project.score.toFixed(2) : "0.00"}
@@ -201,21 +231,47 @@ export function Dashboard() {
                 </Link>
               </div>
 
-              {/* Priority Panel */}
-              <div className="mt-4">
-                <PriorityPanel
-                  strategy={(selectedProject.priority_strategy as "relative" | "absolute" | "mixed") || "relative"}
-                  priority_constant={selectedProject.priority_constant as number}
-                  business_value={selectedProject.business_value as number}
-                  health_status={(selectedProject.health_status as "ok" | "blocked" | "at_risk" | "no_next_step") || "ok"}
-                  score={selectedProject.score as number || 0}
-                />
+              {/* KPI Metrics */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100/30 border border-blue-200 rounded-2xl p-4">
+                  <p className="text-xs font-bold text-blue-700 uppercase tracking-wide mb-1">Estrategia</p>
+                  <p className="text-2xl font-black text-blue-900">{selectedProject.priority_strategy === "relative" ? "Relativa" : selectedProject.priority_strategy === "absolute" ? "Absoluta" : "Mixta"}</p>
+                  <p className="text-xs text-blue-600 mt-2">Cálculo de priorización</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/30 border border-emerald-200 rounded-2xl p-4">
+                  <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">Estado</p>
+                  <p className="text-2xl font-black text-emerald-900">{selectedProject.state}</p>
+                  <p className="text-xs text-emerald-600 mt-2">Situación actual</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100/30 border border-purple-200 rounded-2xl p-4">
+                  <p className="text-xs font-bold text-purple-700 uppercase tracking-wide mb-1">Responsable</p>
+                  <p className="text-2xl font-black text-purple-900 truncate">{selectedProject.responsable || "—"}</p>
+                  <p className="text-xs text-purple-600 mt-2">Propietario del proyecto</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-amber-50 to-amber-100/30 border border-amber-200 rounded-2xl p-4">
+                  <p className="text-xs font-bold text-amber-700 uppercase tracking-wide mb-1">Prioridad</p>
+                  <p className="text-2xl font-black text-amber-900">{selectedProject.prioridad || "Media"}</p>
+                  <p className="text-xs text-amber-600 mt-2">Nivel de importancia</p>
+                </div>
               </div>
 
-              {/* KPI content placeholder */}
-              <div className="p-12 border-2 border-dashed border-slate-100 rounded-2xl flex flex-col items-center justify-center bg-slate-50/50 mt-4">
-                <p className="text-slate-400 font-medium">Las métricas KPI del proyecto se mostrarán aquí.</p>
-              </div>
+              {/* Additional Info */}
+              {selectedProject.fecha_limite && (
+                <div className="mt-4 p-4 bg-rose-50/50 border border-rose-200 rounded-2xl">
+                  <p className="text-xs font-bold text-rose-700 uppercase tracking-wide mb-2">Fecha Límite</p>
+                  <p className="text-sm text-rose-900 font-medium">{new Date(selectedProject.fecha_limite).toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" })}</p>
+                </div>
+              )}
+
+              {selectedProject.siguiente_paso && (
+                <div className="mt-3 p-4 bg-cyan-50/50 border border-cyan-200 rounded-2xl">
+                  <p className="text-xs font-bold text-cyan-700 uppercase tracking-wide mb-2">Siguiente Paso</p>
+                  <p className="text-sm text-cyan-900">{selectedProject.siguiente_paso}</p>
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full min-h-[400px] bg-white rounded-3xl shadow-sm border border-slate-100 gap-4">
@@ -228,211 +284,16 @@ export function Dashboard() {
         </section>
       </div>
 
-      {/* Create modal */}
-      {showCreate && (
-        <CreateProjectModal onClose={() => setShowCreate(false)} />
-      )}
+      <ProjectForm
+        open={showCreateForm}
+        onSubmit={async (data) => {
+          await createProject(data);
+          await fetchProjects();
+          setShowCreateForm(false);
+        }}
+        onClose={() => setShowCreateForm(false)}
+        isLoading={isLoading}
+      />
     </Layout>
-  );
-}
-
-function CreateProjectModal({ onClose }: Readonly<{ onClose: () => void }>) {
-  const t = useT();
-  const [name, setName] = useState("");
-  const [responsable, setResponsable] = useState("");
-  const [bac, setBac] = useState("");
-  const [priorityStrategy, setPriorityStrategy] = useState("relative");
-  const [businessValue, setBusinessValue] = useState("");
-  const [priorityConstant, setPriorityConstant] = useState("");
-  const [error, setError] = useState("");
-  const [templates, setTemplates] = useState<ProjectTemplate[]>([]);
-  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
-  const [applying, setApplying] = useState(false);
-
-  useEffect(() => {
-    svc.getTemplates().then(setTemplates).catch(() => {});
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const bacNum = Number.parseFloat(bac);
-    if (!name.trim() || !responsable.trim() || Number.isNaN(bacNum) || bacNum <= 0) {
-      setError(t("dashboard.name_required"));
-      return;
-    }
-    setApplying(true);
-    try {
-      const projectPayload = {
-        name: name.trim(),
-        responsable: responsable.trim(),
-        bac: bacNum,
-        priority_strategy: priorityStrategy,
-        business_value: Number.parseFloat(businessValue) || 0,
-        priority_constant: Number.parseFloat(priorityConstant) || 0,
-      };
-      
-      const res = await svc.api.post("/projects", projectPayload);
-      const project = res.data;
-      useProjectStore.getState().fetchProjects();
-
-      // Apply template if selected
-      const tpl = templates.find((t) => t.id === selectedTemplate);
-      if (tpl) {
-        for (const phase of tpl.structure) {
-          const phaseBac = Math.round(bacNum * phase.bac_percent / 100);
-          const createdPhase = await svc.createPhase(project.id, { name: phase.name, bac: phaseBac });
-          for (const dept of phase.departments ?? []) {
-            const deptBac = Math.round(phaseBac * dept.bac_percent / 100);
-            await svc.createDepartment(project.id, createdPhase.id, { name: dept.name, bac: deptBac });
-          }
-        }
-      }
-      onClose();
-    } catch (err: any) {
-      setError(err?.response?.data?.detail?.message ?? "Error al crear el proyecto");
-    } finally {
-      setApplying(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
-      <form
-        className="relative bg-white rounded-[2rem] shadow-2xl p-8 w-full max-w-md animate-in zoom-in-95"
-        onSubmit={handleSubmit}
-      >
-        <h3 className="text-2xl font-black text-slate-900 mb-6 tracking-tight">{t("dashboard.new_project")}</h3>
-        {error && (
-          <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 mb-6 font-medium">
-            {error}
-          </div>
-        )}
-        <div className="space-y-5">
-          <div>
-            <label htmlFor="project-name" className="block text-sm font-bold text-slate-700 mb-1.5">{t("dashboard.project_name")}</label>
-            <input
-              id="project-name"
-              className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all font-medium"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={t("dashboard.name_placeholder")}
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="project-responsable" className="block text-sm font-bold text-slate-700 mb-1.5">Responsable</label>
-            <input
-              id="project-responsable"
-              className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all font-medium"
-              value={responsable}
-              onChange={(e) => setResponsable(e.target.value)}
-              placeholder="Nombre del responsable"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="project-bac" className="block text-sm font-bold text-slate-700 mb-1.5">{t("dashboard.budget")}</label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <span className="text-slate-400 font-medium">$</span>
-              </div>
-              <input
-                id="project-bac"
-                type="number"
-                min="1"
-                step="0.01"
-                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl pl-8 pr-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all font-medium"
-                value={bac}
-                onChange={(e) => setBac(e.target.value)}
-                placeholder="100,000"
-                required
-              />
-            </div>
-          </div>
-          <div>
-            <label htmlFor="priority-strategy" className="block text-sm font-bold text-slate-700 mb-1.5">Estrategia de Prioridad</label>
-            <select
-              id="priority-strategy"
-              className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all font-medium appearance-none"
-              value={priorityStrategy}
-              onChange={(e) => setPriorityStrategy(e.target.value)}
-            >
-              <option value="relative">Relativa (Urgencia x Valor)</option>
-              <option value="absolute">Absoluta (Fija)</option>
-              <option value="mixed">Mixta (Salud + Urgencia + Valor + Críticas)</option>
-            </select>
-          </div>
-          {priorityStrategy === "absolute" && (
-            <div>
-              <label htmlFor="priority-constant" className="block text-sm font-bold text-slate-700 mb-1.5">Score Constante</label>
-              <input
-                id="priority-constant"
-                type="number"
-                step="0.01"
-                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all font-medium"
-                value={priorityConstant}
-                onChange={(e) => setPriorityConstant(e.target.value)}
-                placeholder="Ej. 100"
-              />
-            </div>
-          )}
-          {priorityStrategy !== "absolute" && (
-            <div>
-              <label htmlFor="business-value" className="block text-sm font-bold text-slate-700 mb-1.5">Valor de Negocio (0-10)</label>
-              <input
-                id="business-value"
-                type="number"
-                min="0"
-                max="10"
-                step="0.1"
-                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all font-medium"
-                value={businessValue}
-                onChange={(e) => setBusinessValue(e.target.value)}
-                placeholder="Ej. 8.5"
-              />
-            </div>
-          )}
-          {/* Template selector */}
-          {templates.length > 0 && (
-            <div>
-              <label htmlFor="project-tpl" className="block text-sm font-bold text-slate-700 mb-1.5">Plantilla (opcional)</label>
-              <select
-                id="project-tpl"
-                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all font-medium appearance-none"
-                value={selectedTemplate}
-                onChange={(e) => setSelectedTemplate(e.target.value)}
-              >
-                <option value="">Sin plantilla — proyecto vacío</option>
-                {templates.map((t) => (
-                  <option key={t.id} value={t.id}>{t.name} ({t.structure.length} fases)</option>
-                ))}
-              </select>
-              {selectedTemplate && (
-                <p className="text-xs text-slate-500 font-medium mt-2 bg-slate-50 p-2.5 rounded-lg">
-                  {templates.find((t) => t.id === selectedTemplate)?.description}
-                </p>
-              )}
-            </div>
-          )}
-        </div>
-        <div className="flex gap-3 mt-8">
-          <button
-            type="button"
-            className="flex-1 px-4 py-3.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors"
-            onClick={onClose}
-          >
-            {t("action.cancel")}
-          </button>
-          <button
-            type="submit"
-            disabled={applying}
-            className="flex-1 px-4 py-3.5 rounded-xl text-white text-sm font-bold disabled:opacity-50 bg-indigo-600 hover:bg-indigo-700 transition-all shadow-md shadow-indigo-500/20 hover:-translate-y-0.5 active:translate-y-0"
-          >
-            {applying ? t("dashboard.creating") : t("dashboard.create_project")}
-          </button>
-        </div>
-      </form>
-    </div>
   );
 }
