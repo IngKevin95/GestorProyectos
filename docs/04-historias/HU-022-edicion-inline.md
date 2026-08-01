@@ -4,7 +4,7 @@ titulo: Edición inline en el tablero
 epica: EP-001
 prioridad: Must
 complejidad: S
-estado: borrador
+estado: lista
 dependencias: [HU-001]
 ---
 

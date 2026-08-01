@@ -269,3 +269,59 @@ docs/.reviews/20260801-0*.md
 docs/.reviews/20260801-1*.md
 docs/.reviews/20260801-2*.md
 # ── /Fabrica Agentica ──
+
+# Docker volumes and data
+pgdata/
+docker_volumes/
+
+# Environment files (local config)
+.env
+.env.local
+.env.*.local
+
+# Python
+backend/.venv/
+backend/venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.env*.local
+frontend/*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Logs
+*.log
+logs/

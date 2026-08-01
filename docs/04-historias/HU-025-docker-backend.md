@@ -1,10 +1,10 @@
 ---
 id: HU-025
 titulo: Configurar FastAPI backend en docker-compose
-epica: EP-001
+epica: EP-000
 prioridad: Must
 complejidad: M
-estado: borrador
+estado: lista
 ---
 
 # HU-025 — Configurar FastAPI backend en docker-compose

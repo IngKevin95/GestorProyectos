@@ -4,7 +4,7 @@ titulo: Eliminar proyecto del sistema
 epica: EP-001
 prioridad: Must
 complejidad: S
-estado: borrador
+estado: lista
 ---
 
 # HU-020 — Eliminar proyecto del sistema

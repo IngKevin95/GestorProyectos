@@ -1,10 +1,10 @@
 ---
 id: HU-026
 titulo: Configurar React frontend en docker-compose
-epica: EP-003
+epica: EP-000
 prioridad: Must
 complejidad: M
-estado: borrador
+estado: lista
 ---
 
 # HU-026 — Configurar React frontend en docker-compose
