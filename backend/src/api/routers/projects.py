@@ -18,6 +18,7 @@ from src.models.schemas import (
     ProjectUpdate,
 )
 from src.services.health_detection_service import HealthDetectionService
+from src.services.priority_scoring_service import PriorityScoringService
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
@@ -44,6 +45,9 @@ async def create_project(
         bloqueos=body.bloqueos,
         notas=body.notas,
         tipo_proyecto=body.tipo_proyecto,
+        priority_strategy=body.priority_strategy,
+        priority_constant=body.priority_constant,
+        business_value=body.business_value,
         user_id=uuid.UUID(current_user["user_id"])
     )
 
@@ -69,6 +73,8 @@ async def create_project(
     ))
     await db.commit()
     await db.refresh(project)
+    
+    project.score = PriorityScoringService.calculate_score(project)
     return project
 
 
@@ -92,14 +98,28 @@ async def list_projects(
     if responsable:
         stmt = stmt.where(Project.responsable.ilike(f"%{responsable}%"))
 
-    stmt = stmt.order_by(Project.created_at.desc()).limit(limit + 1)
-    if cursor:
-        stmt = stmt.where(Project.id < uuid.UUID(cursor))
-
     result = await db.execute(stmt)
-    items = result.scalars().all()
+    items = list(result.scalars().all())
+    
+    # Calculate scores (EP-003)
+    for p in items:
+        p.score = PriorityScoringService.calculate_score(p)
+        
+    # Sort descending by score, then by name for deterministic tie-breaking
+    items.sort(key=lambda x: (x.score, x.name), reverse=True)
+    
+    # In-memory cursor pagination
+    if cursor:
+        cursor_uuid = uuid.UUID(cursor)
+        try:
+            idx = next(i for i, p in enumerate(items) if p.id == cursor_uuid)
+            items = items[idx + 1:]
+        except StopIteration:
+            items = []
+
     has_more = len(items) > limit
     data = items[:limit]
+    
     return {
         "data": [ProjectResponse.model_validate(p) for p in data],
         "pagination": {
@@ -121,7 +141,8 @@ async def get_project(
     if not project:
         raise NotFoundError("Project", str(project_id))
     _check_rls(project, current_user["user_id"])
-
+    
+    project.score = PriorityScoringService.calculate_score(project)
     return ProjectResponse.model_validate(project)
 
 
@@ -170,6 +191,12 @@ async def update_project(
         project.notas = body.notas
     if body.tipo_proyecto is not None:
         project.tipo_proyecto = body.tipo_proyecto
+    if body.priority_strategy is not None:
+        project.priority_strategy = body.priority_strategy
+    if body.priority_constant is not None:
+        project.priority_constant = body.priority_constant
+    if body.business_value is not None:
+        project.business_value = body.business_value
 
     # EP-002: Re-evaluate health status on update
     old_health = project.health_status
@@ -187,6 +214,10 @@ async def update_project(
     ))
     await db.commit()
     await db.refresh(project)
+    
+    # Calculate score for response
+    project.score = PriorityScoringService.calculate_score(project)
+    
     return project
 
 
