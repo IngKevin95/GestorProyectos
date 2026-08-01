@@ -4,7 +4,7 @@ titulo: Consultar proyecto con todos sus campos
 epica: EP-001
 prioridad: Must
 complejidad: S
-estado: borrador
+estado: lista
 ---
 
 # HU-002 — Consultar proyecto con todos sus campos

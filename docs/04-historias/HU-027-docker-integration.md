@@ -1,10 +1,10 @@
 ---
 id: HU-027
 titulo: Orquestar stack completo en docker-compose
-epica: EP-001
+epica: EP-000
 prioridad: Must
 complejidad: M
-estado: borrador
+estado: lista
 dependencias: [HU-024, HU-025, HU-026]
 ---
 

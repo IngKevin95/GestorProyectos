@@ -5,6 +5,20 @@ fecha: 2026-07-31
 
 # Épicas — GestorProyectos
 
+## EP-000 — Infraestructura Docker (Fundacional)
+
+**Resumen**: Stack base containerizado (PostgreSQL, Backend FastAPI, orquestación) que sustenta todas las épicas de negocio.
+
+**Por qué existe**: sin infraestructura runnable no hay base para construir ni demostrar nada. Es el cimiento.
+
+**Objetivos PRD que atiende**: Requisitos técnicos §10 (docker-compose, dev/prod readiness).
+
+**Capabilities incluidas**: Docker PostgreSQL, Backend FastAPI containerizado, orquestación via docker-compose.
+
+**Éxito medible**: `npm run dev` levanta postgres + backend + frontend listos. Stack verificable en localhost.
+
+---
+
 ## EP-001 — Gestión de Proyectos (CRUD)
 
 **Resumen**: alta, edición y consulta de proyectos con los campos operativos exigidos por el reto
@@ -149,23 +163,24 @@ prioridades distintos (AC producto, sección 9).
 
 ## Matriz Épica × Objetivo-PRD
 
-| Objetivo PRD (sección 1 / Enunciado) | EP-001 | EP-002 | EP-003 | EP-004 | EP-005 | EP-006 | EP-007 | EP-008 | EP-009 |
-|---|---|---|---|---|---|---|---|---|---|
-| Crear/actualizar proyectos | ✓ | | | | | | | | |
-| Edición inline en el tablero | ✓ | | | | | | | | |
-| Detectar en riesgo/bloqueados | | ✓ | | | | | | | |
-| Vista de seguimiento / priorización | | | ✓ | | | | | | |
-| Manejo de tareas (mostrar en video)| | | | ✓ | | | | | |
-| Datos de ejemplo (CSV) | | | | | ✓ | | | | |
-| Seguridad y Roles | | | | | | ✓ | | | |
-| Trazabilidad (Audit Trail) | | | | | | | ✓ | | |
-| Gestión de Plantillas | | | | | | | ✓ | | |
-| Carga de equipo | | | | | | | | ✓ | |
-| Integración Webhooks | | | | | | | | | ✓ |
+| Objetivo PRD (sección 1 / Enunciado) | EP-000 | EP-001 | EP-002 | EP-003 | EP-004 | EP-005 | EP-006 | EP-007 | EP-008 | EP-009 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Stack Docker/docker-compose runnable | ✓ | | | | | | | | | |
+| Crear/actualizar proyectos | | ✓ | | | | | | | | |
+| Edición inline en el tablero | | ✓ | | | | | | | | |
+| Detectar en riesgo/bloqueados | | | ✓ | | | | | | | |
+| Vista de seguimiento / priorización | | | | ✓ | | | | | | |
+| Manejo de tareas (mostrar en video)| | | | | ✓ | | | | | |
+| Datos de ejemplo (CSV) | | | | | | ✓ | | | | |
+| Seguridad y Roles | | | | | | | ✓ | | | |
+| Trazabilidad (Audit Trail) | | | | | | | | ✓ | | |
+| Gestión de Plantillas | | | | | | | | ✓ | | |
+| Carga de equipo | | | | | | | | | ✓ | |
+| Integración Webhooks | | | | | | | | | | ✓ |
 
-## Infraestructura (Integrada)
+## Infraestructura (Formal)
 
-Docker-compose (HU-024, HU-025, HU-027) integrado en EP-001. React frontend docker (HU-026) integrado en EP-003. No hay épica EP-010 independiente.
+**EP-000** es la épica fundacional que cubre el stack Docker completo: PostgreSQL (HU-024), FastAPI backend (HU-025), React frontend (HU-026), y orquestación via docker-compose (HU-027). Es el cimiento que todas las épicas de negocio requieren.
 
 ## Huérfanos
 

@@ -4,7 +4,7 @@ titulo: Listar proyectos con soporte a filtros básicos
 epica: EP-001
 prioridad: Must
 complejidad: M
-estado: borrador
+estado: lista
 dependencias: [HU-002]
 ---
 

@@ -4,7 +4,7 @@ titulo: Crear y actualizar proyecto con campos operativos clave
 epica: EP-001
 prioridad: Must
 complejidad: M
-estado: borrador
+estado: lista
 ---
 
 # HU-001 — Crear y actualizar proyecto con campos operativos clave

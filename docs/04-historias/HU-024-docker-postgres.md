@@ -1,10 +1,10 @@
 ---
 id: HU-024
 titulo: Configurar PostgreSQL 15 en docker-compose
-epica: EP-001
+epica: EP-000
 prioridad: Must
 complejidad: S
-estado: borrador
+estado: lista
 ---
 
 # HU-024 — Configurar PostgreSQL 15 en docker-compose
