@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Task } from "../store/taskStore";
 import { taskService } from "../services/taskService";
+import { useAdminStore } from "../store/adminStore";
 
 interface TaskFormModalProps {
   isOpen: boolean;
@@ -18,6 +19,13 @@ export default function TaskFormModal({ isOpen, onClose, onSave, projectId, task
     status: "abierta",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const { users, fetchUsers } = useAdminStore();
+
+  useEffect(() => {
+    if (isOpen && users.length === 0) {
+      fetchUsers();
+    }
+  }, [isOpen, users.length, fetchUsers]);
 
   useEffect(() => {
     if (task) {
@@ -76,14 +84,20 @@ export default function TaskFormModal({ isOpen, onClose, onSave, projectId, task
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Asignado</label>
-            <input
-              type="text"
+            <select
               value={formData.assignee || ""}
               onChange={(e) => setFormData({ ...formData, assignee: e.target.value })}
-              className={`w-full border border-slate-200 text-sm text-slate-700 rounded-lg px-3 py-2 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 ${errors.assignee ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+              className={`w-full border border-slate-200 text-sm text-slate-700 rounded-lg px-3 py-2 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-white ${errors.assignee ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
               aria-label="Assignee"
-              placeholder="Ej. jperez@empresa.com"
-            />
+            >
+              <option value="">Selecciona un usuario</option>
+              {users.map((user) => (
+                <option key={user.id} value={user.email}>{user.email}</option>
+              ))}
+              {formData.assignee && !users.find(u => u.email === formData.assignee) && (
+                <option value={formData.assignee}>{formData.assignee}</option>
+              )}
+            </select>
             {errors.assignee && <p className="text-red-500 text-xs mt-1">{errors.assignee}</p>}
           </div>
 

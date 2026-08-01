@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Project } from "../types";
 import { Modal } from "./Modal";
+import { useAdminStore } from "../store/adminStore";
 
 interface ProjectFormProps {
   open: boolean;
@@ -44,6 +45,14 @@ export function ProjectForm({ open, project, onSubmit, onClose, isLoading }: Pro
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  const { users, fetchUsers } = useAdminStore();
+
+  useEffect(() => {
+    if (open && users.length === 0) {
+      fetchUsers();
+    }
+  }, [open, users.length, fetchUsers]);
 
   const priorityStrategiesRequiringConstant = ["absolute"];
 
@@ -138,13 +147,20 @@ export function ProjectForm({ open, project, onSubmit, onClose, isLoading }: Pro
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Responsable *</label>
-            <input
-              type="text"
-              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+            <select
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all appearance-none"
               value={formData.responsable}
               onChange={(e) => setFormData({ ...formData, responsable: e.target.value })}
-              placeholder="Nombre del responsable"
-            />
+            >
+              <option value="">Selecciona un usuario</option>
+              {users.map((user) => (
+                <option key={user.id} value={user.email}>{user.email}</option>
+              ))}
+              {/* Fallback en caso de que el responsable actual no sea un email válido pero esté asignado */}
+              {formData.responsable && !users.find(u => u.email === formData.responsable) && (
+                <option value={formData.responsable}>{formData.responsable}</option>
+              )}
+            </select>
             {errors.responsable && <p className="text-red-500 text-xs mt-1 font-medium">{errors.responsable}</p>}
           </div>
 
