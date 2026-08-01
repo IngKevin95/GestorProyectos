@@ -19,7 +19,7 @@
 - **Protección de Datos**: Criterio de aislamiento de tenant/cliente NO requerido para esta versión.
 
 ## 4. Stack Tecnológico (Pre-definido por Producto)
-- **Frontend**: React 18, TypeScript, Vite, Zustand (estado), Vanilla CSS (estilos).
+- **Frontend**: React 18, TypeScript, Vite, Zustand (estado), Tailwind CSS (estilos).
 - **Backend**: FastAPI (Python), PostgreSQL 15+.
 - **Infraestructura**: Docker + docker-compose.
 
@@ -30,7 +30,7 @@
 Dado el PRD y el Tech Discovery, el stack es:
 - **Frontend**: React 18 (SPA), TypeScript, Vite.
   - **Estado**: Zustand (gestión minimalista, sin boilerplate).
-  - **Estilos**: Vanilla CSS.
+  - **Estilos**: Tailwind CSS.
 - **Backend**: FastAPI (Python) - asíncrono, con validación automática y generación de Swagger.
 - **Base de Datos**: PostgreSQL 15+ para integridad relacional.
 - **Infraestructura Local**: Docker y docker-compose.
@@ -128,7 +128,7 @@ Este documento consolida las decisiones de arquitectura, especificaciones técni
 ## 3. Stack Tecnológico Final
 - **Frontend**: React 18, TypeScript, Vite.
 - **Gestor de Estado**: Zustand.
-- **Estilos**: Vanilla CSS.
+- **Estilos**: Tailwind CSS.
 - **Backend API**: FastAPI (Python) nativo asíncrono.
 - **Base de Datos**: PostgreSQL 15+.
 - **Despliegue/Contenedorización**: Docker + docker-compose (ambiente local y demo).

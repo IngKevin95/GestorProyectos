@@ -31,13 +31,13 @@ Este documento actúa como el contrato técnico (`docs/02-architecture/tech-prd.
   - **ADR-006**: Carga de CSV asíncrona con BackgroundTasks, limpieza segura y carga parcial (sin rollback global).
   - **ADR-007**: Motor de prioridad mediante patrón Strategy (configurable en UI).
   - **ADR-008**: PostgreSQL + SQLAlchemy 2.0 (Async).
-  - **ADR-009 / ADR-010**: Vanilla CSS exclusivo. Infra en Docker Compose.
+  - **ADR-009 / ADR-010**: Tailwind CSS exclusivo. Infra en Docker Compose.
 
 ## 4. Diseño e Interfaz
-- **Fuente de Diseño (Estética Premium y Vanilla CSS)**:
-  Diseño dictado por el requisito de impresionar al usuario final ("WOW factor"). Se exige uso exclusivo de Vanilla CSS (ADR-009) con CSS custom properties para tokens de diseño — micro-animaciones, hover effects, paletas HSL y glassmorphism. Queda bloqueado el uso de librerías CSS prefabricadas (MUI/Tailwind) para garantizar el control granular de las interfaces dinámicas.
+- **Fuente de Diseño (Estética Premium y Tailwind CSS)**:
+  Diseño dictado por el requisito de impresionar al usuario final ("WOW factor"). Se exige uso exclusivo de Tailwind CSS (ADR-009) con CSS custom properties para tokens de diseño — micro-animaciones, hover effects, paletas HSL y glassmorphism. Queda bloqueado el uso de librerías CSS prefabricadas (MUI/Tailwind) para garantizar el control granular de las interfaces dinámicas.
   
-  **Nota:** PRD §12 fue actualizado (2026-08-01) para alinear "Utility-first Tailwind CSS" con esta decisión técnica de Vanilla CSS. Véase `docs/02-architecture/design-css.md` para la implementación detallada de design tokens y estructura CSS modular.
+  **Nota:** PRD §12 fue actualizado (2026-08-01) para alinear "Utility-first Tailwind CSS" con esta decisión técnica de Tailwind CSS. Véase `docs/02-architecture/design-css.md` para la implementación detallada de design tokens y estructura CSS modular.
 
 ## 5. Observabilidad y Monitoreo
 - **Logging Estructurado (JSON)**:

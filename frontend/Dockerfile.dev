@@ -1,0 +1,17 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install deps
+COPY package*.json ./
+RUN npm ci --prefer-offline --no-audit
+
+# Copy ALL config files explicitly (fixes tsconfig.json refs)
+COPY tsconfig.json tsconfig.node.json vite.config.ts cypress.config.ts index.html ./
+
+# Copy source (overridden by volume in dev)
+COPY . .
+
+# HMR dev server
+EXPOSE 5173
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

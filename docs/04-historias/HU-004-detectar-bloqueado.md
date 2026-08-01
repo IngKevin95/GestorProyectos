@@ -4,7 +4,7 @@ titulo: Detectar automáticamente proyectos bloqueados
 epica: EP-002
 prioridad: Must
 complejidad: M
-estado: borrador
+estado: lista
 ---
 
 # HU-004 — Detectar automáticamente proyectos bloqueados
