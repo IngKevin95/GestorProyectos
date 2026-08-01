@@ -185,3 +185,81 @@ prioridades distintos (AC producto, sección 9).
 - **Objetivos sin épica**: Ninguno (todos cubiertos por EP-001 a EP-009).
 - **Épicas sin objetivo claro**: Ninguna.
 
+---
+
+## Auditoría MoSCoW — Decisión de Scope
+
+**Fecha:** 2026-08-02 | **Auditor:** Claude | **Framework:** MoSCoW (Must/Should/Could/Won't)
+
+### Épicas Won't (No hacer, guardar post-MVP)
+
+#### EP-009 — Integraciones (Webhooks) → **WON'T**
+
+**Clasificación MoSCoW:** COULD (integración externa, arquitectura avanzada).
+
+**Justificación:**
+1. **PRD Out-of-scope explícito (§7):** "Integración bidireccional en tiempo real... (prohibido para MVP)", "Alertas automáticas externas (Slack, Email, Teams)", "requieren arquitectura más compleja (multitenancia, webhooks bidireccionales, ML)".
+2. **No aparece en Must-have (§6):** Ningún requirement crítico lo menciona.
+3. **Cero impacto KPIs (§5):** No afecta adopción, eficiencia <30s, NPS, retención, completitud de datos, ni explicabilidad del criterio.
+4. **Valor:** Pura extensión post-lanzamiento cuando MVP estabilice y escale a multi-tenant.
+
+**Riesgo de diferir:** NULO — evaluador no lo mide, demo funciona sin él.
+
+#### EP-008 — Vista de Equipo (Team Capacity) → **WON'T**
+
+**Clasificación MoSCoW:** SHOULD (pantalla menciona, pero no crítica para MVP).
+
+**Justificación:**
+1. **PRD clasificación:** §4 lista "Pantallas Should-have: **TeamCapacityPage** (carga por miembro)" pero **§6 (Must-have) no la incluye**.
+2. **No impacta diferencial:** PRD §1 problema: "No hay vista única que indique el estado real de la cartera (qué proyecto está en riesgo, bloqueado o sin rumbo)". Diagnóstico de riesgo ≠ diagnóstico de capacidad humana.
+3. **Cero impacto KPIs (§5):** No afecta adopción, eficiencia de identificación de riesgo, NPS, retención, completitud de datos, ni explicabilidad del criterio.
+4. **Valor:** Análisis secundario (¿está Juan sobrecargado?) útil post-MVP; MVP prioriza detección de riesgo de proyecto (estado, tareas, fechas).
+
+**Riesgo de diferir:** BAJO — asume Aztec gestiona riesgo por proyecto, no por persona. Si "capacidad humana" es bloqueante → confirmar con Kevin.
+
+### Épica Could (Hacer solo si compliance exigida)
+
+#### EP-007 — Trazabilidad y Configuración → **COULD**
+
+**Clasificación MoSCoW:** SHOULD (compliance + agilidad, pero no Must).
+
+**Descomposición:**
+
+**A) Audit Trail (historial de cambios):**
+- **Valor:** Trazabilidad completa (quién, qué, cuándo) de cambios en proyectos.
+- **PRD mención:** §3 "Como Auditor, quiero un registro de cambios...", §4 "AuditTrail".
+- **Riesgo de diferir:** **MEDIO**
+  - *Bajo si:* Demo interna, sin requisito GDPR/compliance regulatoria explícito.
+  - *Alto si:* Aztec está auditada (carga/hacienda/cliente regulado) y exige trazabilidad → diferir bloquea release.
+- **Recomendación:** **Pregunta clave a Kevin antes de comprometer scope:** ¿Aztec tiene requisito de compliance / trazabilidad regulatoria para esta release?
+
+**B) Plantillas (CRUD de templates de proyectos):**
+- **Valor:** Agiliza creación de proyectos reutilizando configuración estándar.
+- **PRD mención:** §4 "TemplatesPage: CRUD de plantillas de proyectos".
+- **Riesgo de diferir:** **BAJO**
+  - MVP sin templates funciona: cada proyecto se llena manualmente (overhead inicial bajo, <15 proyectos dataset).
+  - Diferible post-lanzamiento sin fricción (es feature de productividad, no core).
+
+**Decisión (COULD):**
+- **Audit Trail:** Construir PRE-release solo si Kevin confirma compliance exigida; diferir POST-MVP si no hay requisito.
+- **Plantillas:** Diferir POST-MVP sin riesgo.
+
+---
+
+### Secuencia de Construcción Recomendada
+
+**MVP (Must-have) — Sin diferir:**
+1. ✓ EP-000 (Docker) — done
+2. ✓ EP-001 (CRUD Proyectos) — done
+3. ✓ EP-002 (Motor Salud) — done
+4. ✓ EP-003 (Dashboard + Score) — done
+5. → EP-004 (CRUD Tareas) — **critico** para alimentar motor salud
+6. → EP-005 (Carga Semilla) — **crítico** para demo con datos reales
+7. → EP-006 (Auth JWT) — **crítico** para seguridad infraestructura
+
+**Post-MVP (Should/Could):**
+- EP-007 (Audit Trail) — solo si Kevin confirma compliance
+- EP-007 (Plantillas) — post-lanzamiento, feature de productividad
+- EP-008 (Team Capacity) — post-lanzamiento, análisis secundario
+- EP-009 (Webhooks) — roadmap futuro, arquitectura avanzada
+
