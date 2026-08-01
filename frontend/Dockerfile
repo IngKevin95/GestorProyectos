@@ -6,7 +6,7 @@ WORKDIR /app
 COPY frontend/package.json frontend/package-lock.json* ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
 # Copy source code
 COPY frontend/src ./src
@@ -39,7 +39,7 @@ EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=5s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:3000 || exit 1
 
 # Start the app
 CMD ["serve", "-s", "dist", "-l", "3000"]

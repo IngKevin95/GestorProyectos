@@ -32,7 +32,7 @@ class Base(DeclarativeBase):
 
 
 # Constants for repeated SQL literals (S1192)
-_CK_BAC_POSITIVE = "bac > 0"
+_CK_TOTAL_EFFORT_POSITIVE = "total_effort > 0"
 _FK_USERS_ID = "users.id"
 _FK_PROFILES_ID = "profiles.id"
 
@@ -60,7 +60,7 @@ class User(Base):
 class Project(Base):
     __tablename__ = "projects"
     __table_args__ = (
-        CheckConstraint(_CK_BAC_POSITIVE, name="ck_projects_bac_positive"),
+        CheckConstraint(_CK_TOTAL_EFFORT_POSITIVE, name="ck_projects_effort_positive"),
         UniqueConstraint("user_id", "name", "deleted_at", name="uq_projects_user_name"),
         Index("idx_projects_user_id", "user_id"),
         Index("idx_projects_deleted_at", "deleted_at"),
@@ -71,7 +71,9 @@ class Project(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    bac: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False)
+    total_effort: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False)
+    planned_effort: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False, default=0.0)
+    completed_effort: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False, default=0.0)
     state: Mapped[str] = mapped_column(
         Enum("PLANNING", "ACTIVE", "PAUSED", "COMPLETED", "CANCELLED", name="project_state"),
         nullable=False,
@@ -230,7 +232,6 @@ class Webhook(Base):
     project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id"), nullable=False)
     url: Mapped[str] = mapped_column(String(2048), nullable=False)
     secret: Mapped[str] = mapped_column(String(255), nullable=False)
-    cpi_threshold: Mapped[float] = mapped_column(Numeric(5, 2), nullable=False, default=0.9)
     spi_threshold: Mapped[float] = mapped_column(Numeric(5, 2), nullable=False, default=0.9)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
@@ -308,13 +309,13 @@ class AccountLockout(Base):
 class Profile(Base):
     __tablename__ = "profiles"
     __table_args__ = (
-        CheckConstraint("hourly_rate > 0", name="ck_profiles_hourly_rate_positive"),
+        CheckConstraint("capacity_per_week > 0", name="ck_profiles_capacity_positive"),
         Index("idx_profiles_name", "name"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
-    hourly_rate: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False)
+    capacity_per_week: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())

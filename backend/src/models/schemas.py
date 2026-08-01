@@ -139,9 +139,6 @@ class SettingResponse(BaseModel):
 class SettingsMap(BaseModel):
     """All system settings as a flat dict."""
     country: str = "CO"
-    currency: str = "COP"
-    currency_symbol: str = "$"
-    currency_decimals: str = "0"
     language: str = "es-CO"
     timezone: str = "America/Bogota"
     date_format: str = "dd/MM/yyyy"
@@ -156,8 +153,7 @@ class SettingsUpdate(BaseModel):
     @classmethod
     def validate_keys(cls, v: dict[str, str]) -> dict[str, str]:
         allowed = {
-            "country", "currency", "currency_symbol", "currency_decimals",
-            "language", "timezone", "date_format", "thousand_separator", "decimal_separator",
+            "country", "language", "timezone", "date_format", "thousand_separator", "decimal_separator",
         }
         invalid = set(v.keys()) - allowed
         if invalid:
@@ -168,11 +164,11 @@ class SettingsUpdate(BaseModel):
 # --- Project Templates ---
 class TemplateDepartment(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
-    bac_percent: float = Field(..., gt=0, le=100)
+    effort_percent: float = Field(..., gt=0, le=100)
 
 class TemplatePhase(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
-    bac_percent: float = Field(..., gt=0, le=100)
+    effort_percent: float = Field(..., gt=0, le=100)
     departments: list[TemplateDepartment] = []
 
 class TemplateCreate(BaseModel):
@@ -214,7 +210,7 @@ VALID_TRANSITIONS: dict[str, list[str]] = {
 
 class ProjectCreate(BaseModel):
     name: str = Field(min_length=1, max_length=255)
-    bac: float = Field(gt=0)
+    total_effort: float = Field(gt=0)
     responsable: str = Field(min_length=1, max_length=255)
     estado: ProjectStatus = "Activo"
     prioridad: Optional[ProjectPriority] = None
@@ -227,7 +223,9 @@ class ProjectCreate(BaseModel):
 
 class ProjectUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=255)
-    bac: Optional[float] = Field(None, gt=0)
+    total_effort: Optional[float] = Field(None, gt=0)
+    planned_effort: Optional[float] = Field(None, ge=0)
+    completed_effort: Optional[float] = Field(None, ge=0)
     state: Optional[ProjectState] = None
     responsable: Optional[str] = Field(None, min_length=1, max_length=255)
     estado: Optional[ProjectStatus] = None
@@ -243,7 +241,9 @@ class ProjectUpdate(BaseModel):
 class ProjectResponse(BaseModel):
     id: uuid.UUID
     name: str
-    bac: float
+    total_effort: float
+    planned_effort: float
+    completed_effort: float
     state: ProjectState
     responsable: str
     estado: ProjectStatus
@@ -264,12 +264,12 @@ class ProjectResponse(BaseModel):
 # --- Phases ---
 class PhaseCreate(BaseModel):
     name: str = Field(min_length=1, max_length=255)
-    bac: float = Field(gt=0)
+    total_effort: float = Field(gt=0)
 
 
 class PhaseUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=255)
-    bac: Optional[float] = Field(None, gt=0)
+    total_effort: Optional[float] = Field(None, gt=0)
     version: int
 
 
@@ -277,7 +277,7 @@ class PhaseResponse(BaseModel):
     id: uuid.UUID
     project_id: uuid.UUID
     name: str
-    bac: float
+    total_effort: float
     version: int
     created_at: datetime
 
@@ -287,12 +287,12 @@ class PhaseResponse(BaseModel):
 # --- Departments ---
 class DepartmentCreate(BaseModel):
     name: str = Field(min_length=1, max_length=255)
-    bac: float = Field(gt=0)
+    total_effort: float = Field(gt=0)
 
 
 class DepartmentUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=255)
-    bac: Optional[float] = Field(None, gt=0)
+    total_effort: Optional[float] = Field(None, gt=0)
     version: int
 
 
@@ -300,7 +300,7 @@ class DepartmentResponse(BaseModel):
     id: uuid.UUID
     phase_id: uuid.UUID
     name: str
-    bac: float
+    total_effort: float
     version: int
     created_at: datetime
 
@@ -310,12 +310,12 @@ class DepartmentResponse(BaseModel):
 # --- Profiles ---
 class ProfileCreate(BaseModel):
     name: str = Field(min_length=1, max_length=100)
-    hourly_rate: float = Field(gt=0)
+    capacity_per_week: float = Field(gt=0)
 
 
 class ProfileUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=100)
-    hourly_rate: Optional[float] = Field(None, gt=0)
+    capacity_per_week: Optional[float] = Field(None, gt=0)
     is_active: Optional[bool] = None
     version: int
 
@@ -323,7 +323,7 @@ class ProfileUpdate(BaseModel):
 class ProfileResponse(BaseModel):
     id: uuid.UUID
     name: str
-    hourly_rate: float
+    capacity_per_week: float
     is_active: bool
     version: int
     created_at: datetime
@@ -433,7 +433,6 @@ class WebhookCreate(BaseModel):
     project_id: uuid.UUID
     url: str = Field(min_length=1, max_length=2048)
     secret: str = Field(min_length=16, max_length=255)
-    cpi_threshold: float = Field(default=0.9, ge=0, le=2)
     spi_threshold: float = Field(default=0.9, ge=0, le=2)
 
 
@@ -441,7 +440,6 @@ class WebhookResponse(BaseModel):
     id: uuid.UUID
     project_id: uuid.UUID
     url: str
-    cpi_threshold: float
     spi_threshold: float
     is_active: bool
     created_at: datetime

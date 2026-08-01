@@ -51,7 +51,7 @@ async def create_project(
 ):
     project = Project(
         name=body.name,
-        bac=body.bac,
+        total_effort=body.total_effort,
         responsable=body.responsable,
         status=body.estado,
         prioridad=body.prioridad,
@@ -71,7 +71,7 @@ async def create_project(
         action="CREATE",
         new_value={
             "name": body.name,
-            "bac": float(body.bac),
+            "total_effort": float(body.total_effort),
             "responsable": body.responsable,
             "estado": body.estado,
             "tipo_proyecto": body.tipo_proyecto
@@ -166,8 +166,12 @@ async def update_project(
 
     if body.name:
         project.name = body.name
-    if body.bac:
-        project.bac = body.bac
+    if body.total_effort:
+        project.total_effort = body.total_effort
+    if body.planned_effort is not None:
+        project.planned_effort = body.planned_effort
+    if body.completed_effort is not None:
+        project.completed_effort = body.completed_effort
     if body.responsable:
         project.responsable = body.responsable
     if body.estado:

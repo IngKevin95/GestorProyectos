@@ -222,9 +222,9 @@ __marimo__/
 .claude/agents/factory/
 .claude/hooks/factory.json
 .claude/.factory-version
+docs/.reviews/
 docs/.flow-state.json
 docs/.factory-suggestions.md
-# docs/.reviews/ now includes audit reports — tracked selectively
 # ── /factory-vertical ─────────────────────────────────
 
 # ── factory-arch-vertical (auto) ───────────────────────
@@ -232,9 +232,9 @@ docs/.factory-suggestions.md
 .claude/agents/factory-arch/
 .claude/hooks/arch.json
 .claude/.arch-version
+docs/.reviews/
 docs/.arch-flow-state.json
 docs/.arch-suggestions.md
-# docs/.reviews/ now includes audit reports — tracked selectively
 # ── /factory-arch-vertical ─────────────────────────────
 
 # ── factory-build-harness (auto) ───────────────────────
@@ -325,3 +325,7 @@ htmlcov/
 # Logs
 *.log
 logs/
+
+# â”€â”€ factory-build-harness (auto) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+.claude/state/build-state.json
+# â”€â”€ /factory-build-harness â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
