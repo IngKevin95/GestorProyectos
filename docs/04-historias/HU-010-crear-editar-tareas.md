@@ -4,7 +4,7 @@ titulo: Crear y editar tareas de un proyecto
 epica: EP-004
 prioridad: Must
 complejidad: M
-estado: borrador
+estado: lista
 dependencias: [HU-004, HU-005]
 ---
 

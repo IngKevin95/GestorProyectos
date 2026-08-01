@@ -4,7 +4,7 @@ titulo: Ver tareas de proyecto con filtrado por estado
 epica: EP-004
 prioridad: Must
 complejidad: M
-estado: borrador
+estado: lista
 ---
 
 # HU-011 — Ver tareas de proyecto con filtrado por estado

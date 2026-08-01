@@ -17,6 +17,7 @@ from src.api.routers.users import router as users_router
 from src.api.routers.roles import router as roles_router
 from src.api.routers.settings import router as settings_router
 from src.api.routers.templates import router as templates_router
+from src.api.routers.tasks import router as tasks_router
 from src.core.config import get_settings
 from src.core.database import engine
 from src.middleware.request_id import RequestIDMiddleware
@@ -91,6 +92,7 @@ app.include_router(users_router, prefix=API_V1_PREFIX)
 app.include_router(roles_router, prefix=API_V1_PREFIX)
 app.include_router(settings_router, prefix=API_V1_PREFIX)
 app.include_router(templates_router, prefix=API_V1_PREFIX)
+app.include_router(tasks_router, prefix=API_V1_PREFIX)
 
 
 @app.get("/health", tags=["Health"])
