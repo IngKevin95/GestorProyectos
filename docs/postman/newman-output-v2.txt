@@ -1,0 +1,81 @@
+[0mnewman[0m
+
+[0mEP-004: Task CRUD API Contract Testing[0m
+
+→ [0mAuth - Get Token[0m
+  [90mPOST[39m [90mhttp://localhost:8000/api/v1/auth/login[39m [90m[401 Unauthorized, 642B, 24ms][39m
+
+→ [0m1. POST - Create Task[0m
+  [90mPOST[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks[39m [90m[201 Created, 875B, 14ms][39m
+[32m  √ [39m [90mStatus code is 201[39m
+[32m  √ [39m [90mResponse has required fields[39m
+[32m  √ [39m [90mResponse validates Pydantic schema[39m
+[90m  ┌[39m
+[90m[39m[90m  [90m│[90m [90m'✓ Task created with ID:'[90m[37m, [90m[90m'1[39m
+[90m  [90m│[90m af638da-3e30-43e6-ac90-5cc33bd5118c'[90m[39m
+[90m[39m[90m  └[39m
+[90m[39m
+→ [0m2. GET - List Tasks (all)[0m
+  [90mGET[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks[39m [90m[200 OK, 1.18kB, 7ms][39m
+[32m  √ [39m [90mStatus code is 200[39m
+[32m  √ [39m [90mResponse is TaskListResponse with tasks array[39m
+[32m  √ [39m [90mEach task has required fields[39m
+[32m  √ [39m [90mCount matches array length[39m
+
+→ [0m2b. GET - List Tasks with status filter[0m
+  [90mGET[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks?status=abierta[39m [90m[200 OK, 1.18kB, 9ms][39m
+[32m  √ [39m [90mStatus code is 200[39m
+[32m  √ [39m [90mFiltered tasks match status parameter[39m
+
+→ [0m3. GET - Get Task Detail[0m
+  [90mGET[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks/1af638da-3e30-43e6-ac90-5cc33bd5118c[39m [90m[200 OK, 870B, 9ms][39m
+[32m  √ [39m [90mStatus code is 200[39m
+[32m  √ [39m [90mResponse is TaskResponse with all required fields[39m
+[32m  √ [39m [90mTask ID matches request parameter[39m
+
+→ [0m4. PUT - Update Task[0m
+  [90mPUT[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks/1af638da-3e30-43e6-ac90-5cc33bd5118c[39m [90m[200 OK, 886B, 15ms][39m
+[32m  √ [39m [90mStatus code is 200[39m
+[32m  √ [39m [90mUpdated fields are reflected in response[39m
+[32m  √ [39m [90mVersion incremented after update[39m
+[32m  √ [39m [90mupdated_at timestamp changed[39m
+
+→ [0m4b. PUT - Update with invalid version (optimistic locking)[0m
+  [90mPUT[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks/1af638da-3e30-43e6-ac90-5cc33bd5118c[39m [90m[409 Conflict, 603B, 7ms][39m
+[32m  √ [39m [90mStatus code is 409 Conflict[39m
+[32m  √ [39m [90mError detail indicates version mismatch[39m
+
+→ [0m5. DELETE - Delete Task[0m
+  [90mDELETE[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks/1af638da-3e30-43e6-ac90-5cc33bd5118c[39m [90m[204 No Content, 535B, 10ms][39m
+[32m  √ [39m [90mStatus code is 204 No Content[39m
+[32m  √ [39m [90mResponse body is empty[39m
+
+→ [0m5b. GET - Verify Task Deleted[0m
+  [90mGET[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks/1af638da-3e30-43e6-ac90-5cc33bd5118c[39m [90m[404 Not Found, 581B, 7ms][39m
+[32m  √ [39m [90mStatus code is 404 Not Found[39m
+[32m  √ [39m [90mError message indicates task not found[39m
+
+→ [0mEdge Case - POST with missing required field[0m
+  [90mPOST[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks[39m [90m[422 Unprocessable Entity, 909B, 6ms][39m
+[32m  √ [39m [90mStatus code is 422 Validation Error[39m
+[32m  √ [39m [90mError indicates validation failure[39m
+
+[90m┌─────────────────────────[39m[90m┬──────────────────[39m[90m┬─────────────────┐[39m
+[90m│[39m                         [90m│[39m         executed [90m│[39m          failed [90m│[39m
+[90m├─────────────────────────[39m[90m┼──────────────────[39m[90m┼─────────────────┤[39m
+[90m│[39m              [32miterations[39m [90m│[39m                1 [90m│[39m               0 [90m│[39m
+[90m├─────────────────────────[39m[90m┼──────────────────[39m[90m┼─────────────────┤[39m
+[90m│[39m                [32mrequests[39m [90m│[39m               10 [90m│[39m               0 [90m│[39m
+[90m├─────────────────────────[39m[90m┼──────────────────[39m[90m┼─────────────────┤[39m
+[90m│[39m            [32mtest-scripts[39m [90m│[39m               10 [90m│[39m               0 [90m│[39m
+[90m├─────────────────────────[39m[90m┼──────────────────[39m[90m┼─────────────────┤[39m
+[90m│[39m      [32mprerequest-scripts[39m [90m│[39m                0 [90m│[39m               0 [90m│[39m
+[90m├─────────────────────────[39m[90m┼──────────────────[39m[90m┼─────────────────┤[39m
+[90m│[39m              [32massertions[39m [90m│[39m               24 [90m│[39m               0 [90m│[39m
+[90m├─────────────────────────┴──────────────────┴─────────────────┤[39m
+[90m│[39m total run duration: 858ms                                    [90m│[39m
+[90m├──────────────────────────────────────────────────────────────┤[39m
+[90m│[39m total data received: 2.75kB (approx)                         [90m│[39m
+[90m├──────────────────────────────────────────────────────────────┤[39m
+[90m│[39m average response time: 10ms [min: 6ms, max: 24ms, s.d.: 5ms] [90m│[39m
+[90m└──────────────────────────────────────────────────────────────┘[39m

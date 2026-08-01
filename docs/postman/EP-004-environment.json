@@ -1,0 +1,31 @@
+{
+  "id": "ep-004-task-testing",
+  "name": "EP-004 Task Testing Environment",
+  "values": [
+    {
+      "key": "access_token",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAwNmIyYi0yMDIzLTQ2ZjQtYjMwMC1iNDQ5MmZhNzAwNzYiLCJlbWFpbCI6ImFkbWluQGVtcHJlc2EuY29tIiwicm9sZSI6ImFkbWluIiwidHlwZSI6ImFjY2VzcyIsImV4cCI6MTc4NTYxNjAwMiwiaWF0IjoxNzg1NjEyNDAyfQ.s_jz_hREk-1_SJV3Fj9rhEdmTGmK-KO-9Ly6qoAPUB0",
+      "type": "string",
+      "enabled": true
+    },
+    {
+      "key": "project_id",
+      "value": "238ee927-3b0a-4ee8-8a11-0fd44ea92008",
+      "type": "string",
+      "enabled": true
+    },
+    {
+      "key": "task_id",
+      "value": "",
+      "type": "string",
+      "enabled": true
+    },
+    {
+      "key": "updated_version",
+      "value": "",
+      "type": "string",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}
