@@ -8,7 +8,7 @@ interface ProjectFormProps {
   onSubmit: (data: {
     name: string;
     responsable: string;
-    status: string;
+    estado: string;
     prioridad: string;
     fecha_límite?: string;
     siguiente_paso?: string;
@@ -32,7 +32,7 @@ export function ProjectForm({ open, project, onSubmit, onClose, isLoading }: Pro
   const [formData, setFormData] = useState({
     nombre: project?.name || "",
     responsable: project?.responsable || "",
-    estado: project?.status || "Activo",
+    estado: project?.estado || "Activo",
     prioridad: project?.prioridad || "Media",
     fecha_límite: project?.fecha_límite || "",
     siguiente_paso: project?.siguiente_paso || "",

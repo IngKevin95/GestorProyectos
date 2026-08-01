@@ -14,7 +14,7 @@ function extractError(e: unknown): string {
 interface ProjectInput {
   name: string;
   responsable: string;
-  status: string;
+  estado: string;
   prioridad: string;
   fecha_límite?: string;
   siguiente_paso?: string;
