@@ -87,17 +87,38 @@ async def create_project(
 async def list_projects(
     limit: int = Query(50, le=100),
     cursor: str | None = Query(None),
+    status: str | None = Query(None, description="Filter by proyecto status (Activo, En Pausa, etc.)"),
+    responsable: str | None = Query(None, description="Filter by responsible person"),
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    stmt = select(Project).where(Project.user_id == uuid.UUID(current_user["user_id"]), Project.deleted_at == None).order_by(Project.created_at.desc()).limit(limit + 1)
+    stmt = select(Project).where(
+        Project.user_id == uuid.UUID(current_user["user_id"]),
+        Project.deleted_at == None
+    )
+
+    # Apply filters
+    if status:
+        stmt = stmt.where(Project.status == status)
+    if responsable:
+        stmt = stmt.where(Project.responsable.ilike(f"%{responsable}%"))
+
+    stmt = stmt.order_by(Project.created_at.desc()).limit(limit + 1)
     if cursor:
         stmt = stmt.where(Project.id < uuid.UUID(cursor))
+
     result = await db.execute(stmt)
     items = result.scalars().all()
     has_more = len(items) > limit
     data = items[:limit]
-    return {"data": [ProjectResponse.model_validate(p) for p in data], "pagination": {"limit": limit, "cursor": str(data[-1].id) if data and has_more else None, "has_more": has_more}}
+    return {
+        "data": [ProjectResponse.model_validate(p) for p in data],
+        "pagination": {
+            "limit": limit,
+            "cursor": str(data[-1].id) if data and has_more else None,
+            "has_more": has_more
+        }
+    }
 
 
 @router.get("/{project_id}", response_model=dict)
