@@ -1,0 +1,183 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "GestorProyectos API",
+    "version": "1.0.0",
+    "description": "API for project management and health detection"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Local development server"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check endpoint",
+        "description": "Returns application and database health status",
+        "tags": ["Health"],
+        "responses": {
+          "200": {
+            "description": "Service is healthy or degraded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": ["ok", "degraded"],
+                      "description": "Overall service status"
+                    },
+                    "db": {
+                      "type": "string",
+                      "enum": ["connected", "disconnected"],
+                      "description": "Database connectivity status"
+                    }
+                  },
+                  "required": ["status", "db"],
+                  "example": {
+                    "status": "ok",
+                    "db": "connected"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "API root information",
+        "description": "Returns basic API metadata",
+        "tags": ["Info"],
+        "responses": {
+          "200": {
+            "description": "API information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "string"
+                    },
+                    "docs": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "GestorProyectos API",
+                    "version": "1.0.0",
+                    "docs": "/docs"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Project": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "owner_id": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "paused", "completed"]
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date"
+          },
+          "next_step": {
+            "type": "string"
+          },
+          "blocked_by": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Task": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "project_id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["open", "in_progress", "done", "blocked"]
+          },
+          "assignee_id": {
+            "type": "integer"
+          },
+          "due_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "HealthCheck": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["ok", "degraded"]
+          },
+          "db": {
+            "type": "string",
+            "enum": ["connected", "disconnected"]
+          }
+        },
+        "required": ["status", "db"]
+      }
+    }
+  }
+}
