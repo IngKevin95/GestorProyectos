@@ -3,7 +3,8 @@
     "argv": [
       "C:\\Program Files\\nodejs\\node.exe",
       "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\node_modules\\@playwright\\test\\cli.js",
-      "test"
+      "test",
+      "ep004-tasks.spec.ts"
     ],
     "configFile": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\playwright.config.ts",
     "rootDir": "E:/Datos/Documentos/GitHub Personal/GestorProyectos/frontend/e2e",
@@ -76,82 +77,306 @@
   },
   "suites": [
     {
-      "title": "ep001-crud.spec.ts",
-      "file": "ep001-crud.spec.ts",
+      "title": "ep004-tasks.spec.ts",
+      "file": "ep004-tasks.spec.ts",
       "column": 0,
       "line": 0,
-      "specs": [
+      "specs": [],
+      "suites": [
         {
-          "title": "CRUD operations for projects",
-          "ok": false,
-          "tags": [],
-          "tests": [
+          "title": "EP-004: Gestión de Tareas por Proyecto",
+          "file": "ep004-tasks.spec.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
             {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
-              "results": [
+              "title": "should create a new task for a project",
+              "ok": false,
+              "tags": [],
+              "tests": [
                 {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "timedOut",
-                  "duration": 30050,
-                  "error": {
-                    "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
-                    "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
-                  },
-                  "errors": [
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
                     {
-                      "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
-                    },
-                    {
-                      "location": {
-                        "file": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep001-crud.spec.ts",
-                        "column": 14,
-                        "line": 7
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 5653,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button:has-text(\"Crear\")').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('button:has-text(\"Crear\")').first()\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button:has-text(\"Crear\")').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('button:has-text(\"Crear\")').first()\u001b[22m\n\n    at E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts:13:32",
+                        "location": {
+                          "file": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts",
+                          "column": 32,
+                          "line": 13
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 11 |\u001b[39m     \u001b[90m// Find and click create project button\u001b[39m\n \u001b[90m 12 |\u001b[39m     \u001b[36mconst\u001b[39m createButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"Crear\")'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(createButton)\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m createButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 15 |\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[90m// Fill form\u001b[39m\u001b[0m"
                       },
-                      "message": "Error: page.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"Crear\")')\u001b[22m\n\n\n   5 |   \n   6 |   // Step 3: Create with missing fields check\n>  7 |   await page.click('button:has-text(\"Crear\")');\n     |              ^\n   8 |   await expect(page.locator('label', { hasText: 'Total Effort' })).toBeVisible();\n   9 |   await expect(page.locator('label', { hasText: 'Priority Strategy' })).toBeVisible();\n  10 |   await expect(page.locator('label', { hasText: 'Priority Constant' })).toBeVisible();\n    at E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep001-crud.spec.ts:7:14"
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts",
+                            "column": 32,
+                            "line": 13
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button:has-text(\"Crear\")').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('button:has-text(\"Crear\")').first()\u001b[22m\n\n\n  11 |     // Find and click create project button\n  12 |     const createButton = page.locator('button:has-text(\"Crear\")').first();\n> 13 |     await expect(createButton).toBeVisible({ timeout: 5000 });\n     |                                ^\n  14 |     await createButton.click();\n  15 |\n  16 |     // Fill form\n    at E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts:13:32"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-01T19:09:32.621Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\test-results\\ep004-tasks-EP-004-Gestión-ea3dc-te-a-new-task-for-a-project-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\test-results\\ep004-tasks-EP-004-Gestión-ea3dc-te-a-new-task-for-a-project-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts",
+                        "column": 32,
+                        "line": 13
+                      }
                     }
                   ],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-01T16:47:21.991Z",
-                  "annotations": [],
-                  "attachments": [
-                    {
-                      "name": "screenshot",
-                      "contentType": "image/png",
-                      "path": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\test-results\\ep001-crud-CRUD-operations-for-projects-chromium\\test-failed-1.png"
-                    },
-                    {
-                      "name": "error-context",
-                      "contentType": "text/markdown",
-                      "path": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\test-results\\ep001-crud-CRUD-operations-for-projects-chromium\\error-context.md"
-                    }
-                  ]
+                  "status": "unexpected"
                 }
               ],
-              "status": "unexpected"
+              "id": "92b382944665ccf9c038-8021efeb2ae4397df6ec",
+              "file": "ep004-tasks.spec.ts",
+              "line": 34,
+              "column": 7
+            },
+            {
+              "title": "should display tasks in a table with all required columns",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 5633,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button:has-text(\"Crear\")').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('button:has-text(\"Crear\")').first()\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button:has-text(\"Crear\")').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('button:has-text(\"Crear\")').first()\u001b[22m\n\n    at E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts:13:32",
+                        "location": {
+                          "file": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts",
+                          "column": 32,
+                          "line": 13
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 11 |\u001b[39m     \u001b[90m// Find and click create project button\u001b[39m\n \u001b[90m 12 |\u001b[39m     \u001b[36mconst\u001b[39m createButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"Crear\")'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(createButton)\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m createButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 15 |\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[90m// Fill form\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts",
+                            "column": 32,
+                            "line": 13
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button:has-text(\"Crear\")').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('button:has-text(\"Crear\")').first()\u001b[22m\n\n\n  11 |     // Find and click create project button\n  12 |     const createButton = page.locator('button:has-text(\"Crear\")').first();\n> 13 |     await expect(createButton).toBeVisible({ timeout: 5000 });\n     |                                ^\n  14 |     await createButton.click();\n  15 |\n  16 |     // Fill form\n    at E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts:13:32"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-01T19:09:38.979Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\test-results\\ep004-tasks-EP-004-Gestión-b3310-e-with-all-required-columns-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\test-results\\ep004-tasks-EP-004-Gestión-b3310-e-with-all-required-columns-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts",
+                        "column": 32,
+                        "line": 13
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "92b382944665ccf9c038-9f4781254a57d06a8740",
+              "file": "ep004-tasks.spec.ts",
+              "line": 74,
+              "column": 7
+            },
+            {
+              "title": "should filter tasks by status",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 5621,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button:has-text(\"Crear\")').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('button:has-text(\"Crear\")').first()\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button:has-text(\"Crear\")').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('button:has-text(\"Crear\")').first()\u001b[22m\n\n    at E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts:13:32",
+                        "location": {
+                          "file": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts",
+                          "column": 32,
+                          "line": 13
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 11 |\u001b[39m     \u001b[90m// Find and click create project button\u001b[39m\n \u001b[90m 12 |\u001b[39m     \u001b[36mconst\u001b[39m createButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"Crear\")'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(createButton)\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m createButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 15 |\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[90m// Fill form\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts",
+                            "column": 32,
+                            "line": 13
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button:has-text(\"Crear\")').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('button:has-text(\"Crear\")').first()\u001b[22m\n\n\n  11 |     // Find and click create project button\n  12 |     const createButton = page.locator('button:has-text(\"Crear\")').first();\n> 13 |     await expect(createButton).toBeVisible({ timeout: 5000 });\n     |                                ^\n  14 |     await createButton.click();\n  15 |\n  16 |     // Fill form\n    at E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts:13:32"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-01T19:09:45.007Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\test-results\\ep004-tasks-EP-004-Gestión-6d65f-ould-filter-tasks-by-status-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\test-results\\ep004-tasks-EP-004-Gestión-6d65f-ould-filter-tasks-by-status-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts",
+                        "column": 32,
+                        "line": 13
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "92b382944665ccf9c038-5b75bcb2216e2b123d07",
+              "file": "ep004-tasks.spec.ts",
+              "line": 98,
+              "column": 7
+            },
+            {
+              "title": "should validate required fields in task form",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 5646,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button:has-text(\"Crear\")').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('button:has-text(\"Crear\")').first()\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button:has-text(\"Crear\")').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('button:has-text(\"Crear\")').first()\u001b[22m\n\n    at E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts:13:32",
+                        "location": {
+                          "file": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts",
+                          "column": 32,
+                          "line": 13
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 11 |\u001b[39m     \u001b[90m// Find and click create project button\u001b[39m\n \u001b[90m 12 |\u001b[39m     \u001b[36mconst\u001b[39m createButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"Crear\")'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(createButton)\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m5000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m createButton\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 15 |\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[90m// Fill form\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts",
+                            "column": 32,
+                            "line": 13
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button:has-text(\"Crear\")').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('button:has-text(\"Crear\")').first()\u001b[22m\n\n\n  11 |     // Find and click create project button\n  12 |     const createButton = page.locator('button:has-text(\"Crear\")').first();\n> 13 |     await expect(createButton).toBeVisible({ timeout: 5000 });\n     |                                ^\n  14 |     await createButton.click();\n  15 |\n  16 |     // Fill form\n    at E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts:13:32"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-01T19:09:51.039Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\test-results\\ep004-tasks-EP-004-Gestión-cd140-equired-fields-in-task-form-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\test-results\\ep004-tasks-EP-004-Gestión-cd140-equired-fields-in-task-form-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "E:\\Datos\\Documentos\\GitHub Personal\\GestorProyectos\\frontend\\e2e\\ep004-tasks.spec.ts",
+                        "column": 32,
+                        "line": 13
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "92b382944665ccf9c038-a6967a80589727b9514e",
+              "file": "ep004-tasks.spec.ts",
+              "line": 128,
+              "column": 7
             }
-          ],
-          "id": "0adcc0e8128d65ee523d-04cce472338f1642ab5a",
-          "file": "ep001-crud.spec.ts",
-          "line": 3,
-          "column": 5
+          ]
         }
       ]
     }
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-08-01T16:47:21.727Z",
-    "duration": 30453.624,
+    "startTime": "2026-08-01T19:09:32.248Z",
+    "duration": 24585.323,
     "expected": 0,
     "skipped": 0,
-    "unexpected": 1,
+    "unexpected": 4,
     "flaky": 0
   }
 }

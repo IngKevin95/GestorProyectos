@@ -1,0 +1,194 @@
+[0mnewman[0m
+
+[0mEP-004: Task CRUD API Contract Testing[0m
+
+→ [0mAuth - Get Token[0m
+  [90mPOST[39m [90mhttp://localhost:8000/api/v1/auth/login[39m [90m[401 Unauthorized, 642B, 27ms][39m
+
+→ [0m1. POST - Create Task[0m
+  [90mPOST[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks[39m [90m[404 Not Found, 576B, 4ms][39m
+[31m[1m  1.[22m[39m [31m[1mStatus code is 201[22m[39m
+[31m[1m  2.[22m[39m [31m[1mResponse has required fields[22m[39m
+[31m[1m  3.[22m[39m [31m[1mResponse validates Pydantic schema[22m[39m
+
+→ [0m2. GET - List Tasks (all)[0m
+  [90mGET[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks[39m [90m[404 Not Found, 576B, 3ms][39m
+[31m[1m  4.[22m[39m [31m[1mStatus code is 200[22m[39m
+[31m[1m  5.[22m[39m [31m[1mResponse is TaskListResponse with tasks array[22m[39m
+[31m[1m  6.[22m[39m [31m[1mEach task has required fields[22m[39m
+[31m[1m  7.[22m[39m [31m[1mCount matches array length[22m[39m
+
+→ [0m2b. GET - List Tasks with status filter[0m
+  [90mGET[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks?status=abierta[39m [90m[404 Not Found, 576B, 4ms][39m
+[31m[1m  8.[22m[39m [31m[1mStatus code is 200[22m[39m
+[31m[1m  9.[22m[39m [31m[1mFiltered tasks match status parameter[22m[39m
+
+→ [0m3. GET - Get Task Detail[0m
+  [90mGET[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks/[39m [90m[404 Not Found, 576B, 4ms][39m
+[31m[1m 10.[22m[39m [31m[1mStatus code is 200[22m[39m
+[31m[1m 11.[22m[39m [31m[1mResponse is TaskResponse with all required fields[22m[39m
+[31m[1m 12.[22m[39m [31m[1mTask ID matches request parameter[22m[39m
+
+→ [0m4. PUT - Update Task[0m
+  [90mPUT[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks/[39m [90m[404 Not Found, 576B, 5ms][39m
+[31m[1m 13.[22m[39m [31m[1mStatus code is 200[22m[39m
+[31m[1m 14.[22m[39m [31m[1mUpdated fields are reflected in response[22m[39m
+[31m[1m 15.[22m[39m [31m[1mVersion incremented after update[22m[39m
+[31m[1m 16.[22m[39m [31m[1mupdated_at timestamp changed[22m[39m
+
+→ [0m4b. PUT - Update with invalid version (optimistic locking)[0m
+  [90mPUT[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks/[39m [90m[404 Not Found, 576B, 3ms][39m
+[31m[1m 17.[22m[39m [31m[1mStatus code is 409 Conflict[22m[39m
+[31m[1m 18.[22m[39m [31m[1mError detail indicates version mismatch[22m[39m
+
+→ [0m5. DELETE - Delete Task[0m
+  [90mDELETE[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks/[39m [90m[404 Not Found, 576B, 4ms][39m
+[31m[1m 19.[22m[39m [31m[1mStatus code is 204 No Content[22m[39m
+[31m[1m 20.[22m[39m [31m[1mResponse body is empty[22m[39m
+
+→ [0m5b. GET - Verify Task Deleted[0m
+  [90mGET[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks/[39m [90m[404 Not Found, 576B, 3ms][39m
+[32m  √ [39m [90mStatus code is 404 Not Found[39m
+[31m[1m 21.[22m[39m [31m[1mError message indicates task not found[22m[39m
+
+→ [0mEdge Case - POST with missing required field[0m
+  [90mPOST[39m [90mhttp://localhost:8000/api/v1/projects/238ee927-3b0a-4ee8-8a11-0fd44ea92008/tasks[39m [90m[404 Not Found, 576B, 68ms][39m
+[31m[1m 22.[22m[39m [31m[1mStatus code is 422 Validation Error[22m[39m
+[31m[1m 23.[22m[39m [31m[1mError indicates validation failure[22m[39m
+
+[90m┌─────────────────────────[39m[90m┬──────────────────[39m[90m┬──────────────────┐[39m
+[90m│[39m                         [90m│[39m         executed [90m│[39m           failed [90m│[39m
+[90m├─────────────────────────[39m[90m┼──────────────────[39m[90m┼──────────────────┤[39m
+[90m│[39m              [32miterations[39m [90m│[39m                1 [90m│[39m                0 [90m│[39m
+[90m├─────────────────────────[39m[90m┼──────────────────[39m[90m┼──────────────────┤[39m
+[90m│[39m                [32mrequests[39m [90m│[39m               10 [90m│[39m                0 [90m│[39m
+[90m├─────────────────────────[39m[90m┼──────────────────[39m[90m┼──────────────────┤[39m
+[90m│[39m            [32mtest-scripts[39m [90m│[39m               10 [90m│[39m                0 [90m│[39m
+[90m├─────────────────────────[39m[90m┼──────────────────[39m[90m┼──────────────────┤[39m
+[90m│[39m      [32mprerequest-scripts[39m [90m│[39m                0 [90m│[39m                0 [90m│[39m
+[90m├─────────────────────────[39m[90m┼──────────────────[39m[90m┼──────────────────┤[39m
+[90m│[39m              [31massertions[39m [90m│[39m               24 [90m│[39m               [31m23[39m [90m│[39m
+[90m├─────────────────────────┴──────────────────┴──────────────────┤[39m
+[90m│[39m total run duration: 888ms                                     [90m│[39m
+[90m├───────────────────────────────────────────────────────────────┤[39m
+[90m│[39m total data received: 283B (approx)                            [90m│[39m
+[90m├───────────────────────────────────────────────────────────────┤[39m
+[90m│[39m average response time: 12ms [min: 3ms, max: 68ms, s.d.: 19ms] [90m│[39m
+[90m└───────────────────────────────────────────────────────────────┘[39m
+
+[31m   [31m[4m#[24m[31m [39m[31m [31m[4mfailure[24m[31m        [39m[31m [31m[4mdetail[24m[31m                                                              [39m
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 01.  AssertionError  Status code is 201                                                  
+                      [90mexpected response to have status code 201 but got 404[39m               
+                      [90mat assertion:0 in test-script[39m[90m[39m                                       
+                      [90minside "1. POST - Create Task"[39m                                      
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 02.  AssertionError  Response has required fields                                        
+                      [90mexpected { detail: 'Not Found' } to have property 'id'[39m              
+                      [90mat assertion:1 in test-script[39m[90m[39m                                       
+                      [90minside "1. POST - Create Task"[39m                                      
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 03.  AssertionError  Response validates Pydantic schema                                  
+                      [90mexpected undefined to equal 'Implementar API REST'[39m                  
+                      [90mat assertion:2 in test-script[39m[90m[39m                                       
+                      [90minside "1. POST - Create Task"[39m                                      
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 04.  AssertionError  Status code is 200                                                  
+                      [90mexpected response to have status code 200 but got 404[39m               
+                      [90mat assertion:0 in test-script[39m[90m[39m                                       
+                      [90minside "2. GET - List Tasks (all)"[39m                                  
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 05.  AssertionError  Response is TaskListResponse with tasks array                       
+                      [90mexpected { detail: 'Not Found' } to have property 'tasks'[39m           
+                      [90mat assertion:1 in test-script[39m[90m[39m                                       
+                      [90minside "2. GET - List Tasks (all)"[39m                                  
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 06.  TypeError       Each task has required fields                                       
+                      [90mCannot read properties of undefined (reading 'forEach')[39m             
+                      [90mat assertion:2 in test-script[39m[90m[39m                                       
+                      [90minside "2. GET - List Tasks (all)"[39m                                  
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 07.  TypeError       Count matches array length                                          
+                      [90mCannot read properties of undefined (reading 'length')[39m              
+                      [90mat assertion:3 in test-script[39m[90m[39m                                       
+                      [90minside "2. GET - List Tasks (all)"[39m                                  
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 08.  AssertionError  Status code is 200                                                  
+                      [90mexpected response to have status code 200 but got 404[39m               
+                      [90mat assertion:0 in test-script[39m[90m[39m                                       
+                      [90minside "2b. GET - List Tasks with status filter"[39m                    
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 09.  AssertionError  Filtered tasks match status parameter                               
+                      [90mexpected undefined to be an array[39m                                   
+                      [90mat assertion:1 in test-script[39m[90m[39m                                       
+                      [90minside "2b. GET - List Tasks with status filter"[39m                    
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 10.  AssertionError  Status code is 200                                                  
+                      [90mexpected response to have status code 200 but got 404[39m               
+                      [90mat assertion:0 in test-script[39m[90m[39m                                       
+                      [90minside "3. GET - Get Task Detail"[39m                                   
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 11.  AssertionError  Response is TaskResponse with all required fields                   
+                      [90mexpected { detail: 'Not Found' } to have property 'id'[39m              
+                      [90mat assertion:1 in test-script[39m[90m[39m                                       
+                      [90minside "3. GET - Get Task Detail"[39m                                   
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 12.  AssertionError  Task ID matches request parameter                                   
+                      [90mexpected undefined to equal ''[39m                                      
+                      [90mat assertion:2 in test-script[39m[90m[39m                                       
+                      [90minside "3. GET - Get Task Detail"[39m                                   
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 13.  AssertionError  Status code is 200                                                  
+                      [90mexpected response to have status code 200 but got 404[39m               
+                      [90mat assertion:0 in test-script[39m[90m[39m                                       
+                      [90minside "4. PUT - Update Task"[39m                                       
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 14.  AssertionError  Updated fields are reflected in response                            
+                      [90mexpected undefined to equal 'Implementar API REST - Actualizado'[39m    
+                      [90mat assertion:1 in test-script[39m[90m[39m                                       
+                      [90minside "4. PUT - Update Task"[39m                                       
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 15.  AssertionError  Version incremented after update                                    
+                      [90mexpected undefined to be a number or a date[39m                         
+                      [90mat assertion:2 in test-script[39m[90m[39m                                       
+                      [90minside "4. PUT - Update Task"[39m                                       
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 16.  AssertionError  updated_at timestamp changed                                        
+                      [90mexpected undefined to exist[39m                                         
+                      [90mat assertion:3 in test-script[39m[90m[39m                                       
+                      [90minside "4. PUT - Update Task"[39m                                       
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 17.  AssertionError  Status code is 409 Conflict                                         
+                      [90mexpected response to have status code 409 but got 404[39m               
+                      [90mat assertion:0 in test-script[39m[90m[39m                                       
+                      [90minside "4b. PUT - Update with invalid version (optimistic locking)"[39m 
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 18.  AssertionError  Error detail indicates version mismatch                             
+                      [90mexpected 'Not Found' to include 'Version mismatch'[39m                  
+                      [90mat assertion:1 in test-script[39m[90m[39m                                       
+                      [90minside "4b. PUT - Update with invalid version (optimistic locking)"[39m 
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 19.  AssertionError  Status code is 204 No Content                                       
+                      [90mexpected response to have status code 204 but got 404[39m               
+                      [90mat assertion:0 in test-script[39m[90m[39m                                       
+                      [90minside "5. DELETE - Delete Task"[39m                                    
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 20.  AssertionError  Response body is empty                                              
+                      [90mexpected '{"detail":"Not Found"}' to equal ''[39m                       
+                      [90mat assertion:1 in test-script[39m[90m[39m                                       
+                      [90minside "5. DELETE - Delete Task"[39m                                    
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 21.  AssertionError  Error message indicates task not found                              
+                      [90mexpected 'Not Found' to include 'not found'[39m                         
+                      [90mat assertion:1 in test-script[39m[90m[39m                                       
+                      [90minside "5b. GET - Verify Task Deleted"[39m                              
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 22.  AssertionError  Status code is 422 Validation Error                                 
+                      [90mexpected response to have status code 422 but got 404[39m               
+                      [90mat assertion:0 in test-script[39m[90m[39m                                       
+                      [90minside "Edge Case - POST with missing required field"[39m               
+[90m     [39m[90m                [39m[90m                                                                     [39m
+ 23.  AssertionError  Error indicates validation failure                                  
+                      [90mexpected 'Not Found' to be an array[39m                                 
+                      [90mat assertion:1 in test-script[39m[90m[39m                                       
+                      [90minside "Edge Case - POST with missing required field"[39m               

@@ -1,0 +1,479 @@
+{
+  "info": {
+    "name": "EP-004: Task CRUD API Contract Testing",
+    "description": "Contract tests for Task CRUD endpoints of EP-004 (Gestión de Tareas por Proyecto)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth - Get Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "  var jsonData = pm.response.json();",
+              "  pm.environment.set('access_token', jsonData.access_token);",
+              "  console.log('✓ Token obtained:', jsonData.access_token.substring(0, 20) + '...');",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/v1/auth/login",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "v1", "auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "1. POST - Create Task",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 201', function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Response has required fields', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData).to.have.property('id');",
+              "  pm.expect(jsonData).to.have.property('project_id');",
+              "  pm.expect(jsonData).to.have.property('title');",
+              "  pm.expect(jsonData).to.have.property('assignee');",
+              "  pm.expect(jsonData).to.have.property('priority');",
+              "  pm.expect(jsonData).to.have.property('status');",
+              "  pm.expect(jsonData).to.have.property('version');",
+              "  pm.expect(jsonData).to.have.property('created_at');",
+              "  pm.expect(jsonData).to.have.property('updated_at');",
+              "});",
+              "",
+              "pm.test('Response validates Pydantic schema', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData.title).to.equal('Implementar API REST');",
+              "  pm.expect(jsonData.assignee).to.equal('Kevin Orduz');",
+              "  pm.expect(jsonData.priority).to.equal('alta');",
+              "  pm.expect(jsonData.status).to.equal('abierta');",
+              "  pm.expect(jsonData.version).to.equal(1);",
+              "});",
+              "",
+              "if (pm.response.code === 201) {",
+              "  var jsonData = pm.response.json();",
+              "  pm.environment.set('task_id', jsonData.id);",
+              "  pm.environment.set('project_id', jsonData.project_id);",
+              "  console.log('✓ Task created with ID:', jsonData.id);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Implementar API REST\",\n  \"assignee\": \"Kevin Orduz\",\n  \"priority\": \"alta\",\n  \"status\": \"abierta\",\n  \"due_date\": \"2026-09-30T23:59:59Z\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/v1/projects/{{project_id}}/tasks",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "v1", "projects", "{{project_id}}", "tasks"]
+        }
+      }
+    },
+    {
+      "name": "2. GET - List Tasks (all)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response is TaskListResponse with tasks array', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData).to.have.property('tasks');",
+              "  pm.expect(jsonData).to.have.property('count');",
+              "  pm.expect(jsonData.tasks).to.be.an('array');",
+              "});",
+              "",
+              "pm.test('Each task has required fields', function () {",
+              "  var jsonData = pm.response.json();",
+              "  jsonData.tasks.forEach(function(task) {",
+              "    pm.expect(task).to.have.property('id');",
+              "    pm.expect(task).to.have.property('project_id');",
+              "    pm.expect(task).to.have.property('title');",
+              "    pm.expect(task).to.have.property('assignee');",
+              "    pm.expect(task).to.have.property('priority');",
+              "    pm.expect(task).to.have.property('status');",
+              "    pm.expect(task).to.have.property('version');",
+              "  });",
+              "});",
+              "",
+              "pm.test('Count matches array length', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData.count).to.equal(jsonData.tasks.length);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/api/v1/projects/{{project_id}}/tasks",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "v1", "projects", "{{project_id}}", "tasks"]
+        }
+      }
+    },
+    {
+      "name": "2b. GET - List Tasks with status filter",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Filtered tasks match status parameter', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData.tasks).to.be.an('array');",
+              "  jsonData.tasks.forEach(function(task) {",
+              "    pm.expect(['abierta', 'vencida', 'bloqueada', 'cerrada']).to.include(task.status);",
+              "  });",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/api/v1/projects/{{project_id}}/tasks?status=abierta",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "v1", "projects", "{{project_id}}", "tasks"],
+          "query": [
+            {
+              "key": "status",
+              "value": "abierta"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "3. GET - Get Task Detail",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response is TaskResponse with all required fields', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData).to.have.property('id');",
+              "  pm.expect(jsonData).to.have.property('project_id');",
+              "  pm.expect(jsonData).to.have.property('title');",
+              "  pm.expect(jsonData).to.have.property('assignee');",
+              "  pm.expect(jsonData).to.have.property('priority');",
+              "  pm.expect(jsonData).to.have.property('status');",
+              "  pm.expect(jsonData).to.have.property('version');",
+              "  pm.expect(jsonData).to.have.property('created_at');",
+              "  pm.expect(jsonData).to.have.property('updated_at');",
+              "});",
+              "",
+              "pm.test('Task ID matches request parameter', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData.id).to.equal(pm.environment.get('task_id'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/api/v1/projects/{{project_id}}/tasks/{{task_id}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "v1", "projects", "{{project_id}}", "tasks", "{{task_id}}"]
+        }
+      }
+    },
+    {
+      "name": "4. PUT - Update Task",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Updated fields are reflected in response', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData.title).to.equal('Implementar API REST - Actualizado');",
+              "  pm.expect(jsonData.status).to.equal('bloqueada');",
+              "});",
+              "",
+              "pm.test('Version incremented after update', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData.version).to.be.above(1);",
+              "  pm.environment.set('updated_version', jsonData.version);",
+              "});",
+              "",
+              "pm.test('updated_at timestamp changed', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData.updated_at).to.exist;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Implementar API REST - Actualizado\",\n  \"status\": \"bloqueada\",\n  \"version\": 1\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/v1/projects/{{project_id}}/tasks/{{task_id}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "v1", "projects", "{{project_id}}", "tasks", "{{task_id}}"]
+        }
+      }
+    },
+    {
+      "name": "4b. PUT - Update with invalid version (optimistic locking)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 409 Conflict', function () {",
+              "  pm.response.to.have.status(409);",
+              "});",
+              "",
+              "pm.test('Error detail indicates version mismatch', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData.detail).to.include('Version mismatch');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Otra actualización\",\n  \"version\": 999\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/v1/projects/{{project_id}}/tasks/{{task_id}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "v1", "projects", "{{project_id}}", "tasks", "{{task_id}}"]
+        }
+      }
+    },
+    {
+      "name": "5. DELETE - Delete Task",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 204 No Content', function () {",
+              "  pm.response.to.have.status(204);",
+              "});",
+              "",
+              "pm.test('Response body is empty', function () {",
+              "  pm.expect(pm.response.text()).to.equal('');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/api/v1/projects/{{project_id}}/tasks/{{task_id}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "v1", "projects", "{{project_id}}", "tasks", "{{task_id}}"]
+        }
+      }
+    },
+    {
+      "name": "5b. GET - Verify Task Deleted",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 404 Not Found', function () {",
+              "  pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test('Error message indicates task not found', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData.detail).to.include('not found');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/api/v1/projects/{{project_id}}/tasks/{{task_id}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "v1", "projects", "{{project_id}}", "tasks", "{{task_id}}"]
+        }
+      }
+    },
+    {
+      "name": "Edge Case - POST with missing required field",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 422 Validation Error', function () {",
+              "  pm.response.to.have.status(422);",
+              "});",
+              "",
+              "pm.test('Error indicates validation failure', function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData.detail).to.be.an('array');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/v1/projects/{{project_id}}/tasks",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "v1", "projects", "{{project_id}}", "tasks"]
+        }
+      }
+    }
+  ]
+}

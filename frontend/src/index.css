@@ -1,7 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Inter, system-ui, sans-serif;
+/* ── Design Tokens ──────────────────────────────── */
+:root {
+  /* Typography scale — única fuente de verdad */
+  --text-page-title:    1.5rem;   /* 24px — h1 de página */
+  --text-section-title: 1.125rem; /* 18px — h2 de sección */
+  --text-card-title:    0.9375rem;/* 15px — título de tarjeta */
+  --text-body:          0.875rem; /* 14px — texto de cuerpo */
+  --text-label:         0.8125rem;/* 13px — labels de formulario */
+  --text-caption:       0.75rem;  /* 12px — captions, badges */
+  --text-micro:         0.6875rem;/* 11px — metadatos, timestamps */
+
+  /* Font weights */
+  --fw-regular: 400;
+  --fw-medium:  500;
+  --fw-semibold: 600;
+  --fw-bold:    700;
+  --fw-black:   800;
+
+  /* Colors — paleta única */
+  --color-heading:   #0f172a; /* slate-900 */
+  --color-body:      #334155; /* slate-700 */
+  --color-muted:     #64748b; /* slate-500 */
+  --color-subtle:    #94a3b8; /* slate-400 */
+  --color-border:    #e2e8f0; /* slate-200 */
+  --color-surface:   #f8fafc; /* slate-50 */
+  --color-brand:     #18524C; /* indigo-600 custom */
+  --color-brand-lt:  #E6F0EE; /* indigo-50 custom */
 }
+
+/* ── Base ────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: var(--text-body);
+  font-weight: var(--fw-regular);
+  color: var(--color-body);
+  background-color: var(--color-surface);
+  line-height: 1.5;
+}
+
+/* ── Typography helpers ──────────────────────────── */
+.text-page-title {
+  font-size: var(--text-page-title);
+  font-weight: var(--fw-bold);
+  color: var(--color-heading);
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+
+.text-section-title {
+  font-size: var(--text-section-title);
+  font-weight: var(--fw-semibold);
+  color: var(--color-heading);
+  letter-spacing: -0.01em;
+}
+
+.text-card-title {
+  font-size: var(--text-card-title);
+  font-weight: var(--fw-semibold);
+  color: var(--color-heading);
+}
+
+.text-body-strong {
+  font-size: var(--text-body);
+  font-weight: var(--fw-medium);
+  color: var(--color-body);
+}
+
+.text-label {
+  font-size: var(--text-label);
+  font-weight: var(--fw-semibold);
+  color: var(--color-body);
+  letter-spacing: 0.01em;
+}
+
+.text-caption {
+  font-size: var(--text-caption);
+  font-weight: var(--fw-medium);
+  color: var(--color-muted);
+}
+
+.text-micro {
+  font-size: var(--text-micro);
+  font-weight: var(--fw-medium);
+  color: var(--color-subtle);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* ── Animations ─────────────────────────────────── */
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.2s ease-out forwards;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slide-in-from-top {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Scrollbar ──────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+

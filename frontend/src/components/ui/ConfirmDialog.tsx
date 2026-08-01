@@ -13,24 +13,24 @@ interface ConfirmDialogProps {
 
 export function ConfirmDialog({
   open, onClose, onConfirm, title, message,
-  confirmLabel = "Confirm", isDestructive = false,
+  confirmLabel = "Confirmar", isDestructive = false,
 }: Readonly<ConfirmDialogProps>) {
   return (
     <Modal open={open} onClose={onClose} title={title}>
-      <p className="text-sm text-gray-600 mb-6">{message}</p>
+      <p className="text-sm text-slate-600 mb-6 leading-relaxed">{message}</p>
       <div className="flex justify-end gap-3">
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2 text-sm rounded-lg border border-gray-200 hover:bg-gray-50"
+          className="px-4 py-2 text-sm font-medium rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
         >
-          Cancel
+          Cancelar
         </button>
         <button
           type="button"
           onClick={() => { onConfirm(); onClose(); }}
-          className={`px-4 py-2 text-sm rounded-lg text-white font-medium ${
-            isDestructive ? "bg-red-600 hover:bg-red-700" : "bg-cyan-600 hover:bg-cyan-700"
+          className={`px-4 py-2 text-sm font-semibold rounded-lg text-white transition-colors ${
+            isDestructive ? "bg-red-600 hover:bg-red-700" : "bg-indigo-600 hover:bg-indigo-700"
           }`}
         >
           {confirmLabel}

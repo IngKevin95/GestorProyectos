@@ -390,3 +390,48 @@ class AuditLogResponse(BaseModel):
     changed_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+# --- TASKS (EP-004) ---
+class TaskCreate(BaseModel):
+    title: str = Field(min_length=1, max_length=500)
+    assignee: str = Field(min_length=1, max_length=255)
+    priority: Literal["alta", "media", "baja"] = Field(default="media")
+    status: Literal["abierta", "vencida", "bloqueada", "cerrada"] = Field(default="abierta")
+    due_date: Optional[datetime] = None
+
+    @field_validator("title")
+    @classmethod
+    def validate_title(cls, v):
+        if not v or not v.strip():
+            raise ValueError("Title is required")
+        return v
+
+
+class TaskUpdate(BaseModel):
+    title: Optional[str] = Field(None, min_length=1, max_length=500)
+    assignee: Optional[str] = Field(None, min_length=1, max_length=255)
+    priority: Optional[Literal["alta", "media", "baja"]] = None
+    status: Optional[Literal["abierta", "vencida", "bloqueada", "cerrada"]] = None
+    due_date: Optional[datetime] = None
+    version: int = Field(..., ge=1)  # Required for optimistic locking
+
+
+class TaskResponse(BaseModel):
+    id: uuid.UUID
+    project_id: uuid.UUID
+    title: str
+    assignee: str
+    priority: str
+    status: str
+    due_date: Optional[datetime] = None
+    version: int
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class TaskListResponse(BaseModel):
+    tasks: list[TaskResponse]
+    count: int

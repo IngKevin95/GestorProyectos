@@ -1,39 +1,164 @@
-<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="1" time="30.453624">
-<testsuite name="ep001-crud.spec.ts" timestamp="2026-08-01T16:47:21.752Z" hostname="chromium" tests="1" failures="0" skipped="0" time="30.05" errors="1">
-<testcase name="CRUD operations for projects" classname="ep001-crud.spec.ts" time="30.05">
+<testsuites id="" name="" tests="4" failures="4" skipped="0" errors="0" time="24.585323">
+<testsuite name="ep004-tasks.spec.ts" timestamp="2026-08-01T19:09:32.341Z" hostname="chromium" tests="4" failures="4" skipped="0" time="22.553" errors="0">
+<testcase name="EP-004: Gestión de Tareas por Proyecto › should create a new task for a project" classname="ep004-tasks.spec.ts" time="5.653">
 <system-out>
 <![CDATA[
-[[ATTACHMENT|ep001-crud-CRUD-operations-for-projects-chromium\test-failed-1.png]]
+[[ATTACHMENT|ep004-tasks-EP-004-Gestión-ea3dc-te-a-new-task-for-a-project-chromium\test-failed-1.png]]
 
-[[ATTACHMENT|ep001-crud-CRUD-operations-for-projects-chromium\error-context.md]]
+[[ATTACHMENT|ep004-tasks-EP-004-Gestión-ea3dc-te-a-new-task-for-a-project-chromium\error-context.md]]
 ]]>
 </system-out>
-<error message="Test timeout of 30000ms exceeded." type="Error">
-<![CDATA[  [chromium] › ep001-crud.spec.ts:3:5 › CRUD operations for projects ───────────────────────────────
+<failure message="expect(locator).toBeVisible() failed" type="expect.toBeVisible">
+<![CDATA[  [chromium] › ep004-tasks.spec.ts:34:7 › EP-004: Gestión de Tareas por Proyecto › should create a new task for a project 
 
-    Test timeout of 30000ms exceeded.
+    Error: expect(locator).toBeVisible() failed
 
-    Error: page.click: Test timeout of 30000ms exceeded.
+    Locator: locator('button:has-text("Crear")').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
     Call log:
-      - waiting for locator('button:has-text("Crear")')
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('button:has-text("Crear")').first()
 
 
-       5 |   
-       6 |   // Step 3: Create with missing fields check
-    >  7 |   await page.click('button:has-text("Crear")');
-         |              ^
-       8 |   await expect(page.locator('label', { hasText: 'Total Effort' })).toBeVisible();
-       9 |   await expect(page.locator('label', { hasText: 'Priority Strategy' })).toBeVisible();
-      10 |   await expect(page.locator('label', { hasText: 'Priority Constant' })).toBeVisible();
-        at E:\Datos\Documentos\GitHub Personal\GestorProyectos\frontend\e2e\ep001-crud.spec.ts:7:14
+      11 |     // Find and click create project button
+      12 |     const createButton = page.locator('button:has-text("Crear")').first();
+    > 13 |     await expect(createButton).toBeVisible({ timeout: 5000 });
+         |                                ^
+      14 |     await createButton.click();
+      15 |
+      16 |     // Fill form
+        at E:\Datos\Documentos\GitHub Personal\GestorProyectos\frontend\e2e\ep004-tasks.spec.ts:13:32
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ..\test-results\ep001-crud-CRUD-operations-for-projects-chromium\test-failed-1.png
+    ..\test-results\ep004-tasks-EP-004-Gestión-ea3dc-te-a-new-task-for-a-project-chromium\test-failed-1.png
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-    Error Context: ..\test-results\ep001-crud-CRUD-operations-for-projects-chromium\error-context.md
+    Error Context: ..\test-results\ep004-tasks-EP-004-Gestión-ea3dc-te-a-new-task-for-a-project-chromium\error-context.md
 ]]>
-</error>
+</failure>
+</testcase>
+<testcase name="EP-004: Gestión de Tareas por Proyecto › should display tasks in a table with all required columns" classname="ep004-tasks.spec.ts" time="5.633">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ep004-tasks-EP-004-Gestión-b3310-e-with-all-required-columns-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|ep004-tasks-EP-004-Gestión-b3310-e-with-all-required-columns-chromium\error-context.md]]
+]]>
+</system-out>
+<failure message="expect(locator).toBeVisible() failed" type="expect.toBeVisible">
+<![CDATA[  [chromium] › ep004-tasks.spec.ts:74:7 › EP-004: Gestión de Tareas por Proyecto › should display tasks in a table with all required columns 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('button:has-text("Crear")').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('button:has-text("Crear")').first()
+
+
+      11 |     // Find and click create project button
+      12 |     const createButton = page.locator('button:has-text("Crear")').first();
+    > 13 |     await expect(createButton).toBeVisible({ timeout: 5000 });
+         |                                ^
+      14 |     await createButton.click();
+      15 |
+      16 |     // Fill form
+        at E:\Datos\Documentos\GitHub Personal\GestorProyectos\frontend\e2e\ep004-tasks.spec.ts:13:32
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\test-results\ep004-tasks-EP-004-Gestión-b3310-e-with-all-required-columns-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\test-results\ep004-tasks-EP-004-Gestión-b3310-e-with-all-required-columns-chromium\error-context.md
+]]>
+</failure>
+</testcase>
+<testcase name="EP-004: Gestión de Tareas por Proyecto › should filter tasks by status" classname="ep004-tasks.spec.ts" time="5.621">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ep004-tasks-EP-004-Gestión-6d65f-ould-filter-tasks-by-status-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|ep004-tasks-EP-004-Gestión-6d65f-ould-filter-tasks-by-status-chromium\error-context.md]]
+]]>
+</system-out>
+<failure message="expect(locator).toBeVisible() failed" type="expect.toBeVisible">
+<![CDATA[  [chromium] › ep004-tasks.spec.ts:98:7 › EP-004: Gestión de Tareas por Proyecto › should filter tasks by status 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('button:has-text("Crear")').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('button:has-text("Crear")').first()
+
+
+      11 |     // Find and click create project button
+      12 |     const createButton = page.locator('button:has-text("Crear")').first();
+    > 13 |     await expect(createButton).toBeVisible({ timeout: 5000 });
+         |                                ^
+      14 |     await createButton.click();
+      15 |
+      16 |     // Fill form
+        at E:\Datos\Documentos\GitHub Personal\GestorProyectos\frontend\e2e\ep004-tasks.spec.ts:13:32
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\test-results\ep004-tasks-EP-004-Gestión-6d65f-ould-filter-tasks-by-status-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\test-results\ep004-tasks-EP-004-Gestión-6d65f-ould-filter-tasks-by-status-chromium\error-context.md
+]]>
+</failure>
+</testcase>
+<testcase name="EP-004: Gestión de Tareas por Proyecto › should validate required fields in task form" classname="ep004-tasks.spec.ts" time="5.646">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ep004-tasks-EP-004-Gestión-cd140-equired-fields-in-task-form-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|ep004-tasks-EP-004-Gestión-cd140-equired-fields-in-task-form-chromium\error-context.md]]
+]]>
+</system-out>
+<failure message="expect(locator).toBeVisible() failed" type="expect.toBeVisible">
+<![CDATA[  [chromium] › ep004-tasks.spec.ts:128:7 › EP-004: Gestión de Tareas por Proyecto › should validate required fields in task form 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('button:has-text("Crear")').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('button:has-text("Crear")').first()
+
+
+      11 |     // Find and click create project button
+      12 |     const createButton = page.locator('button:has-text("Crear")').first();
+    > 13 |     await expect(createButton).toBeVisible({ timeout: 5000 });
+         |                                ^
+      14 |     await createButton.click();
+      15 |
+      16 |     // Fill form
+        at E:\Datos\Documentos\GitHub Personal\GestorProyectos\frontend\e2e\ep004-tasks.spec.ts:13:32
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\test-results\ep004-tasks-EP-004-Gestión-cd140-equired-fields-in-task-form-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\test-results\ep004-tasks-EP-004-Gestión-cd140-equired-fields-in-task-form-chromium\error-context.md
+]]>
+</failure>
 </testcase>
 </testsuite>
 </testsuites>

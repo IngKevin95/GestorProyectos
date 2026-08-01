@@ -7,18 +7,17 @@ interface ProjectFormProps {
   project?: Project;
   onSubmit: (data: {
     name: string;
+    total_effort: number;
     responsable: string;
     estado: string;
     prioridad: string;
-    fecha_límite?: string;
+    fecha_limite?: string;
     siguiente_paso?: string;
     bloqueos?: string;
     notas?: string;
     tipo_proyecto: string;
-    total_effort?: number;
     priority_strategy?: string;
-    priority_constant?: number;
-    business_value?: number;
+    version?: number;
   }) => Promise<void>;
   onClose: () => void;
   isLoading?: boolean;
@@ -34,18 +33,19 @@ export function ProjectForm({ open, project, onSubmit, onClose, isLoading }: Pro
     responsable: project?.responsable || "",
     estado: project?.estado || "Activo",
     prioridad: project?.prioridad || "Media",
-    fecha_límite: project?.fecha_límite || "",
+    fecha_limite: project?.fecha_limite || "",
     siguiente_paso: project?.siguiente_paso || "",
     bloqueos: project?.bloqueos || "",
     notas: project?.notas || "",
     tipo_proyecto: project?.tipo_proyecto || "Proyecto",
-    total_effort: (project as any)?.total_effort || 0,
-    priority_strategy: project?.priority_strategy || "",
-    priority_constant: project?.priority_constant || 0,
-    business_value: project?.business_value || 0,
+    priority_strategy: project?.priority_strategy || "relative",
+    priority_constant: project?.priority_constant ?? 50,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  const priorityStrategiesRequiringConstant = ["absolute"];
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -63,238 +63,247 @@ export function ProjectForm({ open, project, onSubmit, onClose, isLoading }: Pro
     }
 
     try {
-      // Map form fields to backend field names: nombre → name, estado → status
-      await onSubmit({
-        ...formData,
+      const payload: any = {
         name: formData.nombre,
+        responsable: formData.responsable,
         estado: formData.estado,
-      } as any);
+        prioridad: formData.prioridad,
+        fecha_limite: formData.fecha_limite || undefined,
+        siguiente_paso: formData.siguiente_paso || undefined,
+        bloqueos: formData.bloqueos || undefined,
+        notas: formData.notas || undefined,
+        tipo_proyecto: formData.tipo_proyecto,
+        priority_strategy: formData.priority_strategy,
+      };
+
+      if (!project) {
+        payload.total_effort = 100;
+      }
+
+      if (project?.version !== undefined) {
+        payload.version = project.version;
+      }
+
+      if (priorityStrategiesRequiringConstant.includes(formData.priority_strategy)) {
+        payload.priority_constant = formData.priority_constant;
+      }
+      await onSubmit(payload);
       setFormData({
         nombre: "",
         responsable: "",
         estado: "Activo",
         prioridad: "Media",
-        fecha_límite: "",
+        fecha_limite: "",
         siguiente_paso: "",
         bloqueos: "",
         notas: "",
         tipo_proyecto: "Proyecto",
-        total_effort: 0,
-        priority_strategy: "",
-        priority_constant: 0,
-        business_value: 0,
+        priority_strategy: "relative",
+        priority_constant: 50,
       });
       onClose();
     } catch (error) {
-      setErrors({ submit: "Error al guardar el proyecto" });
+      console.error("Error submitting form:", error);
     }
   };
 
   return (
-    <Modal open={open} onClose={onClose} title={project ? "Editar Proyecto" : "Crear Proyecto"}>
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {errors.submit && (
-          <div className="bg-red-50 text-red-700 p-3 rounded-lg text-sm">{errors.submit}</div>
-        )}
+    <Modal open={open} onClose={onClose} title={project ? "Editar Proyecto" : "Nuevo Proyecto"} wide>
+      <form onSubmit={handleSubmit} className="space-y-5 max-h-[72vh] overflow-y-auto pr-1">
 
-        {/* Nombre */}
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Nombre *</label>
-          <input
-            type="text"
-            name="nombre"
-            value={formData.nombre}
-            onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-              errors.nombre
-                ? "border-red-500 focus:ring-red-500"
-                : "border-slate-300 focus:ring-indigo-500"
-            }`}
-            placeholder="Ej: Diagnóstico de infraestructura"
-          />
-          {errors.nombre && <p className="text-red-600 text-sm mt-1">{errors.nombre}</p>}
-        </div>
+        {/* ── Sección básica ── */}
+        <div className="space-y-4">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Información básica</p>
 
-        {/* Responsable */}
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Responsable *</label>
-          <input
-            type="text"
-            name="responsable"
-            value={formData.responsable}
-            onChange={(e) => setFormData({ ...formData, responsable: e.target.value })}
-            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-              errors.responsable
-                ? "border-red-500 focus:ring-red-500"
-                : "border-slate-300 focus:ring-indigo-500"
-            }`}
-            placeholder="Ej: Alice"
-          />
-          {errors.responsable && <p className="text-red-600 text-sm mt-1">{errors.responsable}</p>}
-        </div>
-
-        {/* Estado y Prioridad */}
-        <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Estado</label>
-            <select
-              name="estado"
-              value={formData.estado}
-              onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              {ESTADOS.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nombre *</label>
+            <input
+              type="text"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+              value={formData.nombre}
+              onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+              placeholder="Nombre del proyecto"
+            />
+            {errors.nombre && <p className="text-red-500 text-xs mt-1 font-medium">{errors.nombre}</p>}
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Prioridad</label>
-            <select
-              name="prioridad"
-              value={formData.prioridad}
-              onChange={(e) => setFormData({ ...formData, prioridad: e.target.value })}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              {PRIORIDADES.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Responsable *</label>
+            <input
+              type="text"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+              value={formData.responsable}
+              onChange={(e) => setFormData({ ...formData, responsable: e.target.value })}
+              placeholder="Nombre del responsable"
+            />
+            {errors.responsable && <p className="text-red-500 text-xs mt-1 font-medium">{errors.responsable}</p>}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Tipo de Proyecto</label>
+              <select
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all appearance-none"
+                value={formData.tipo_proyecto}
+                onChange={(e) => setFormData({ ...formData, tipo_proyecto: e.target.value })}
+              >
+                {TIPOS.map((tipo) => (
+                  <option key={tipo} value={tipo}>{tipo}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Prioridad</label>
+              <select
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all appearance-none"
+                value={formData.prioridad}
+                onChange={(e) => setFormData({ ...formData, prioridad: e.target.value })}
+              >
+                {PRIORIDADES.map((prioridad) => (
+                  <option key={prioridad} value={prioridad}>{prioridad}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Estado</label>
+              <select
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all appearance-none"
+                value={formData.estado}
+                onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+              >
+                {ESTADOS.map((estado) => (
+                  <option key={estado} value={estado}>{estado}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Fecha Límite</label>
+              <input
+                type="date"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+                value={formData.fecha_limite}
+                onChange={(e) => setFormData({ ...formData, fecha_limite: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Siguiente Paso</label>
+            <input
+              type="text"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+              value={formData.siguiente_paso}
+              onChange={(e) => setFormData({ ...formData, siguiente_paso: e.target.value })}
+              placeholder="¿Cuál es el siguiente paso?"
+            />
           </div>
         </div>
 
-        {/* Tipo de Proyecto */}
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Tipo de Proyecto</label>
-          <select
-            name="tipo_proyecto"
-            value={formData.tipo_proyecto}
-            onChange={(e) => setFormData({ ...formData, tipo_proyecto: e.target.value })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        {/* ── Sección contexto ── */}
+        <div className="space-y-4">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Contexto (opcional)</p>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Bloqueos</label>
+            <textarea
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all resize-none"
+              rows={2}
+              value={formData.bloqueos}
+              onChange={(e) => setFormData({ ...formData, bloqueos: e.target.value })}
+              placeholder="¿Hay algo que bloquea este proyecto?"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Notas</label>
+            <textarea
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all resize-none"
+              rows={2}
+              value={formData.notas}
+              onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
+              placeholder="Notas adicionales"
+            />
+          </div>
+        </div>
+
+        {/* ── Sección avanzada (colapsable) ── */}
+        <div className="border-t border-slate-100 pt-4">
+          <button
+            type="button"
+            className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors w-full"
+            onClick={() => setShowAdvanced((v) => !v)}
           >
-            {TIPOS.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
+            <svg
+              className={`w-4 h-4 transition-transform ${showAdvanced ? "rotate-90" : ""}`}
+              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+            Configuración avanzada de priorización
+          </button>
+
+          {showAdvanced && (
+            <div className="mt-4 space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Estrategia de Priorización</label>
+                <select
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all appearance-none"
+                  value={formData.priority_strategy}
+                  onChange={(e) => setFormData({ ...formData, priority_strategy: e.target.value })}
+                >
+                  <option value="relative">Relativa (Urgencia × Valor)</option>
+                  <option value="absolute">Absoluta (Fija)</option>
+                  <option value="mixed">Mixta (Salud + Urgencia + Valor + Críticas)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Constante de Prioridad</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  disabled={!priorityStrategiesRequiringConstant.includes(formData.priority_strategy)}
+                  className={`w-full rounded-xl px-4 py-3 text-sm transition-all ${
+                    priorityStrategiesRequiringConstant.includes(formData.priority_strategy)
+                      ? "bg-white border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
+                      : "bg-slate-50 border border-slate-100 text-slate-400 cursor-not-allowed"
+                  }`}
+                  value={formData.priority_constant}
+                  onChange={(e) => setFormData({ ...formData, priority_constant: parseInt(e.target.value) || 0 })}
+                  placeholder="0 – 100"
+                />
+                <p className="text-xs text-slate-400 mt-1.5 font-medium">
+                  {priorityStrategiesRequiringConstant.includes(formData.priority_strategy)
+                    ? "Valor fijo de prioridad entre 0 y 100. Solo disponible para estrategia Absoluta."
+                    : "Solo disponible cuando la estrategia es Absoluta."}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Fecha Límite */}
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Fecha Límite</label>
-          <input
-            type="date"
-            name="fecha_límite"
-            value={formData.fecha_límite}
-            onChange={(e) => setFormData({ ...formData, fecha_límite: e.target.value })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-
-        {/* Siguiente Paso */}
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Siguiente Paso</label>
-          <input
-            type="text"
-            name="siguiente_paso"
-            value={formData.siguiente_paso}
-            onChange={(e) => setFormData({ ...formData, siguiente_paso: e.target.value })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            placeholder="Ej: Revisar brief con cliente"
-          />
-        </div>
-
-        {/* Bloqueos */}
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Bloqueos</label>
-          <textarea
-            name="bloqueos"
-            value={formData.bloqueos}
-            onChange={(e) => setFormData({ ...formData, bloqueos: e.target.value })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            rows={2}
-            placeholder="Ej: Pendiente aprobación presupuesto"
-          />
-        </div>
-
-        {/* Notas */}
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Notas</label>
-          <textarea
-            name="notas"
-            value={formData.notas}
-            onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            rows={2}
-            placeholder="Notas internas"
-          />
-        </div>
-
-        {/* Missing Fields */}
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Total Effort</label>
-          <input
-            type="number"
-            name="total_effort"
-            value={formData.total_effort}
-            onChange={(e) => setFormData({ ...formData, total_effort: Number(e.target.value) })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Priority Strategy</label>
-          <input
-            type="text"
-            name="priority_strategy"
-            value={formData.priority_strategy}
-            onChange={(e) => setFormData({ ...formData, priority_strategy: e.target.value })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Priority Constant</label>
-          <input
-            type="number"
-            name="priority_constant"
-            value={formData.priority_constant}
-            onChange={(e) => setFormData({ ...formData, priority_constant: Number(e.target.value) })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Business Value</label>
-          <input
-            type="number"
-            name="business_value"
-            value={formData.business_value}
-            onChange={(e) => setFormData({ ...formData, business_value: Number(e.target.value) })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-
-        {/* Botones */}
-        <div className="flex gap-3 justify-end pt-4">
+        <div className="flex justify-end gap-3 pt-2 border-t border-slate-100">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+            className="px-4 py-2 text-sm rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors font-medium"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={isLoading}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+            className="px-5 py-2 text-sm rounded-lg text-white font-semibold bg-indigo-600 hover:bg-indigo-700 transition-colors disabled:opacity-50 shadow-sm"
           >
-            {isLoading ? "Guardando..." : project ? "Guardar Cambios" : "Crear"}
+            {isLoading ? "Guardando..." : project ? "Actualizar" : "Crear proyecto"}
           </button>
         </div>
       </form>
     </Modal>
   );
 }
+
