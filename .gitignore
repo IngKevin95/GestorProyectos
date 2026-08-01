@@ -245,7 +245,6 @@ docs/.arch-suggestions.md
 .claude/*
 .agents/
 .claudeignore
-openspec/
 node_modules/
 package.json
 package-lock.json
