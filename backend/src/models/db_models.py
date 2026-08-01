@@ -92,6 +92,14 @@ class Project(Base):
         nullable=False,
         default="ok"
     )
+    # Priority configuration (EP-003)
+    priority_strategy: Mapped[str] = mapped_column(
+        Enum("relative", "absolute", "mixed", name="priority_strategy_enum"),
+        nullable=False,
+        default="relative"
+    )
+    priority_constant: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False, default=0.0)
+    business_value: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False, default=0.0)
     # ---
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey(_FK_USERS_ID), nullable=False)
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

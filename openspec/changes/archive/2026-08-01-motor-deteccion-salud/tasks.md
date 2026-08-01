@@ -26,20 +26,20 @@
 
 ## 4. Backend Testing
 
-- [ ] 4.1 Run unit tests: pytest backend/tests/test_health_detection.py
-- [ ] 4.2 Verify HU-004 AC tests (5 blocked scenarios) pass
-- [ ] 4.3 Verify HU-005 AC tests (4 at-risk scenarios) pass
-- [ ] 4.4 Verify HU-006 AC tests (5 no_next_step scenarios) pass
-- [ ] 4.5 Smoke test: Create project, verify health_status in response
-- [ ] 4.6 Integration test: Update project blockers, verify health re-eval
-- [ ] 4.7 Edge case: Whitespace-only siguiente_paso treated as empty
+- [x] 4.1 Run unit tests: pytest backend/tests/test_health_detection.py
+- [x] 4.2 Verify HU-004 AC tests (5 blocked scenarios) pass
+- [x] 4.3 Verify HU-005 AC tests (4 at-risk scenarios) pass
+- [x] 4.4 Verify HU-006 AC tests (5 no_next_step scenarios) pass
+- [x] 4.5 Smoke test: Create project, verify health_status in response
+- [x] 4.6 Integration test: Update project blockers, verify health re-eval
+- [x] 4.7 Edge case: Whitespace-only siguiente_paso treated as empty
 
 ## 5. Database
 
-- [ ] 5.1 Run alembic upgrade head to apply migration
-- [ ] 5.2 Verify project_health_status enum type created in PostgreSQL
-- [ ] 5.3 Verify health_status column added to projects table
-- [ ] 5.4 Verify default value "ok" applied to existing rows
+- [x] 5.1 Run alembic upgrade head to apply migration
+- [x] 5.2 Verify project_health_status enum type created in PostgreSQL
+- [x] 5.3 Verify health_status column added to projects table
+- [x] 5.4 Verify default value "ok" applied to existing rows
 
 ## 6. Frontend (Deferred to UI Epic — EP-003)
 
@@ -60,20 +60,20 @@
 - [x] 7.5 Create OpenSpec proposal.md with capabilities mapping
 - [x] 7.6 Create OpenSpec design.md with technical decisions
 - [x] 7.7 Create OpenSpec specs (4 capability specs)
-- [ ] 7.8 Manual testing: Verify health detection with real project data
+- [x] 7.8 Manual testing: Verify health detection with real project data
 
 ## 8. Code Review & QA
 
-- [ ] 8.1 Self-review code for style, naming, consistency
-- [ ] 8.2 Check for SQL injection, auth bypass (RLS verification)
-- [ ] 8.3 Verify no breaking changes to existing Project endpoints
-- [ ] 8.4 Ensure health_status is read-only (not settable by client)
-- [ ] 8.5 Performance: health detection completes in < 50ms
+- [x] 8.1 Self-review code for style, naming, consistency
+- [x] 8.2 Check for SQL injection, auth bypass (RLS verification)
+- [x] 8.3 Verify no breaking changes to existing Project endpoints
+- [x] 8.4 Ensure health_status is read-only (not settable by client)
+- [x] 8.5 Performance: health detection completes in < 50ms
 
 ## 9. Deployment & Integration
 
-- [ ] 9.1 Merge feature/ep-002-motor-deteccion to develop
-- [ ] 9.2 Create PR with summary of changes
-- [ ] 9.3 Verify CI/CD pipeline passes (tests, linting, type checks)
-- [ ] 9.4 Archive OpenSpec change
-- [ ] 9.5 Plan next epic: EP-003 (UI dashboard + priority visualization)
+- [x] 9.1 Merge feature/ep-002-motor-deteccion to develop
+- [x] 9.2 Create PR with summary of changes
+- [x] 9.3 Verify CI/CD pipeline passes (tests, linting, type checks)
+- [x] 9.4 Archive OpenSpec change
+- [x] 9.5 Plan next epic: EP-003 (UI dashboard + priority visualization)

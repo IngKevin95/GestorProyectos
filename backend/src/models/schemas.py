@@ -198,6 +198,8 @@ ProjectStatus = Literal["Activo", "En Pausa", "Completado", "Cancelado"]
 ProjectPriority = Literal["Alta", "Media", "Baja"]
 ProjectType = Literal["Mantenimiento", "Recurrente", "Diagnóstico", "Proyecto"]
 
+PriorityStrategy = Literal["relative", "absolute", "mixed"]
+
 VALID_TRANSITIONS: dict[str, list[str]] = {
     "PLANNING": ["ACTIVE", "CANCELLED"],
     "ACTIVE": ["PAUSED", "COMPLETED", "CANCELLED"],
@@ -218,6 +220,9 @@ class ProjectCreate(BaseModel):
     bloqueos: Optional[str] = Field(None, max_length=1000)
     notas: Optional[str] = Field(None, max_length=5000)
     tipo_proyecto: Optional[ProjectType] = None
+    priority_strategy: Optional[PriorityStrategy] = "relative"
+    priority_constant: Optional[float] = Field(0.0, ge=0)
+    business_value: Optional[float] = Field(0.0, ge=0)
 
 
 class ProjectUpdate(BaseModel):
@@ -232,6 +237,9 @@ class ProjectUpdate(BaseModel):
     bloqueos: Optional[str] = Field(None, max_length=1000)
     notas: Optional[str] = Field(None, max_length=5000)
     tipo_proyecto: Optional[ProjectType] = None
+    priority_strategy: Optional[PriorityStrategy] = None
+    priority_constant: Optional[float] = Field(None, ge=0)
+    business_value: Optional[float] = Field(None, ge=0)
     version: int
 
 
@@ -249,6 +257,10 @@ class ProjectResponse(BaseModel):
     notas: Optional[str] = None
     tipo_proyecto: Optional[ProjectType] = None
     health_status: str = "ok"  # EP-002: ok, blocked, at_risk, no_next_step
+    priority_strategy: str = "relative"
+    priority_constant: float = 0.0
+    business_value: float = 0.0
+    score: Optional[float] = None
     user_id: uuid.UUID
     version: int
     created_at: datetime
