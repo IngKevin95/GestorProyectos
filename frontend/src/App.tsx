@@ -13,6 +13,7 @@ import { NotFoundPage } from "./pages/NotFoundPage";
 import { useAuthStore } from "./store/authStore";
 import { useSettingsStore } from "./store/settingsStore";
 import { useEffect } from "react";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 function ProtectedRoute({ children }: Readonly<{ children: React.ReactNode }>) {
   const { accessToken } = useAuthStore();
@@ -29,9 +30,10 @@ export default function App() {
   }, [accessToken, fetchSettings]);
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
+    <ErrorBoundary>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
         <Route
           path="/dashboard"
           element={
@@ -84,5 +86,6 @@ export default function App() {
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
+    </ErrorBoundary>
   );
 }
