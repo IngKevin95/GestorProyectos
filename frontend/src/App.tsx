@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react'
+import './styles/variables.css'
+import './styles/globals.css'
+import './styles/components.css'
 
 interface Project {
   id: string
@@ -146,30 +149,40 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold mb-2">Gestor de Proyectos</h1>
-        <p className="text-gray-600 mb-8">Gestiona tu cartera de proyectos</p>
+    <div className="dashboard">
+      <div className="dashboard-container">
+        <div className="dashboard-header">
+          <div>
+            <h1 className="dashboard-title">Gestor de Proyectos</h1>
+            <p className="dashboard-subtitle">Gestiona tu cartera de proyectos</p>
+          </div>
+        </div>
 
-        {error && <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-lg mb-6">{error}</div>}
+        {error && <div className="error-message">{error}</div>}
 
         {/* Filtros */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6 flex gap-4">
-          <input
-            type="text"
-            placeholder="Filtrar por estado..."
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg"
-          />
-          <input
-            type="text"
-            placeholder="Filtrar por responsable..."
-            value={filterResponsable}
-            onChange={(e) => setFilterResponsable(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg"
-          />
-          <button onClick={() => { setFilterStatus(''); setFilterResponsable('') }} className="px-3 py-2 bg-gray-300 text-gray-700 rounded-lg">
+        <div className="filters-section">
+          <div className="filter-group">
+            <label>Estado</label>
+            <input
+              type="text"
+              placeholder="Filtrar por estado..."
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="form-input"
+            />
+          </div>
+          <div className="filter-group">
+            <label>Responsable</label>
+            <input
+              type="text"
+              placeholder="Filtrar por responsable..."
+              value={filterResponsable}
+              onChange={(e) => setFilterResponsable(e.target.value)}
+              className="form-input"
+            />
+          </div>
+          <button onClick={() => { setFilterStatus(''); setFilterResponsable('') }} className="filter-button">
             Limpiar filtros
           </button>
         </div>
@@ -177,34 +190,58 @@ function App() {
         {/* Botón crear */}
         <button
           onClick={() => setShowForm(!showForm)}
-          className="mb-6 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="btn btn-primary"
         >
           {showForm ? 'Cancelar' : '+ Nuevo Proyecto'}
         </button>
 
         {/* Formulario */}
         {showForm && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <div className="grid grid-cols-2 gap-4">
-              <input type="text" placeholder="Nombre" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="px-3 py-2 border border-gray-300 rounded-lg" />
-              <input type="number" placeholder="BAC" value={formData.bac} onChange={(e) => setFormData({...formData, bac: Number(e.target.value)})} className="px-3 py-2 border border-gray-300 rounded-lg" />
-              <input type="text" placeholder="Responsable" value={formData.responsable} onChange={(e) => setFormData({...formData, responsable: e.target.value})} className="px-3 py-2 border border-gray-300 rounded-lg" />
-              <select value={formData.estado} onChange={(e) => setFormData({...formData, estado: e.target.value})} className="px-3 py-2 border border-gray-300 rounded-lg">
-                <option>Activo</option>
-                <option>En Pausa</option>
-                <option>Completado</option>
-                <option>Cancelado</option>
-              </select>
-              <select value={formData.prioridad} onChange={(e) => setFormData({...formData, prioridad: e.target.value})} className="px-3 py-2 border border-gray-300 rounded-lg">
-                <option>Alta</option>
-                <option>Media</option>
-                <option>Baja</option>
-              </select>
-              <input type="date" value={formData.fecha_limite} onChange={(e) => setFormData({...formData, fecha_limite: e.target.value})} className="px-3 py-2 border border-gray-300 rounded-lg" />
-              <input type="text" placeholder="Siguiente paso" value={formData.siguiente_paso} onChange={(e) => setFormData({...formData, siguiente_paso: e.target.value})} className="px-3 py-2 border border-gray-300 rounded-lg col-span-2" />
-              <textarea placeholder="Notas" value={formData.notas} onChange={(e) => setFormData({...formData, notas: e.target.value})} className="px-3 py-2 border border-gray-300 rounded-lg col-span-2" rows={3} />
+          <div className="form-section">
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label">Nombre</label>
+                <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="form-input" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">BAC</label>
+                <input type="number" value={formData.bac} onChange={(e) => setFormData({...formData, bac: Number(e.target.value)})} className="form-input" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Responsable</label>
+                <input type="text" value={formData.responsable} onChange={(e) => setFormData({...formData, responsable: e.target.value})} className="form-input" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Estado</label>
+                <select value={formData.estado} onChange={(e) => setFormData({...formData, estado: e.target.value})} className="form-input">
+                  <option>Activo</option>
+                  <option>En Pausa</option>
+                  <option>Completado</option>
+                  <option>Cancelado</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Prioridad</label>
+                <select value={formData.prioridad} onChange={(e) => setFormData({...formData, prioridad: e.target.value})} className="form-input">
+                  <option>Alta</option>
+                  <option>Media</option>
+                  <option>Baja</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Fecha Límite</label>
+                <input type="date" value={formData.fecha_limite} onChange={(e) => setFormData({...formData, fecha_limite: e.target.value})} className="form-input" />
+              </div>
+              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                <label className="form-label">Siguiente Paso</label>
+                <input type="text" value={formData.siguiente_paso} onChange={(e) => setFormData({...formData, siguiente_paso: e.target.value})} className="form-input" />
+              </div>
+              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                <label className="form-label">Notas</label>
+                <textarea value={formData.notas} onChange={(e) => setFormData({...formData, notas: e.target.value})} className="form-input form-textarea" rows={3} />
+              </div>
             </div>
-            <button onClick={handleCreate} className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+            <button onClick={handleCreate} className="btn btn-primary">
               Guardar Proyecto
             </button>
           </div>
@@ -212,30 +249,33 @@ function App() {
 
         {/* Tabla de proyectos */}
         {loading ? (
-          <p>Cargando...</p>
+          <div className="loading">Cargando...</div>
         ) : projects.length === 0 ? (
-          <p className="text-gray-500">No hay proyectos. {!filterStatus && !filterResponsable && 'Crea uno nuevo.'}</p>
+          <div className="empty-state">
+            <div className="empty-state-title">No hay proyectos</div>
+            {!filterStatus && !filterResponsable && <p>Crea uno nuevo.</p>}
+          </div>
         ) : (
-          <div className="overflow-x-auto bg-white rounded-lg shadow">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-100 border-b">
+          <div className="table-container">
+            <table className="table">
+              <thead>
                 <tr>
-                  <th className="p-3 text-left">Nombre</th>
-                  <th className="p-3 text-left">Responsable</th>
-                  <th className="p-3 text-left">Estado</th>
-                  <th className="p-3 text-left">Prioridad</th>
-                  <th className="p-3 text-left">Siguiente Paso</th>
-                  <th className="p-3 text-left">Acciones</th>
+                  <th>Nombre</th>
+                  <th>Responsable</th>
+                  <th>Estado</th>
+                  <th>Prioridad</th>
+                  <th>Siguiente Paso</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {projects.map((p) => (
-                  <tr key={p.id} className="border-b hover:bg-gray-50">
-                    <td className="p-3">{p.name}</td>
-                    <td className="p-3">{p.responsable}</td>
-                    <td className="p-3"><span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{p.estado}</span></td>
-                    <td className="p-3">{p.prioridad || '-'}</td>
-                    <td className="p-3">
+                  <tr key={p.id}>
+                    <td>{p.name}</td>
+                    <td>{p.responsable}</td>
+                    <td><span className="badge badge-success">{p.estado}</span></td>
+                    <td>{p.prioridad || '-'}</td>
+                    <td>
                       {editingField === `${p.id}-siguiente_paso` ? (
                         <input
                           autoFocus
@@ -243,16 +283,16 @@ function App() {
                           defaultValue={p.siguiente_paso || ''}
                           onBlur={(e) => handleInlineEdit(p.id, 'siguiente_paso', e.currentTarget.value, p.version)}
                           onKeyDown={(e) => e.key === 'Enter' && handleInlineEdit(p.id, 'siguiente_paso', e.currentTarget.value, p.version)}
-                          className="px-2 py-1 border border-gray-300 rounded"
+                          className="inline-edit-input"
                         />
                       ) : (
-                        <span onDoubleClick={() => setEditingField(`${p.id}-siguiente_paso`)} className="cursor-pointer hover:underline">
+                        <span onDoubleClick={() => setEditingField(`${p.id}-siguiente_paso`)} className="inline-edit">
                           {p.siguiente_paso || '-'}
                         </span>
                       )}
                     </td>
-                    <td className="p-3 flex gap-2">
-                      <button onClick={() => handleDelete(p.id)} className="px-2 py-1 bg-red-100 text-red-600 rounded text-xs hover:bg-red-200">
+                    <td>
+                      <button onClick={() => handleDelete(p.id)} className="btn btn-danger">
                         Eliminar
                       </button>
                     </td>
