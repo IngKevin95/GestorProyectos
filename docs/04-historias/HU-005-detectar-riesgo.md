@@ -4,7 +4,7 @@ titulo: Detectar automáticamente proyectos en riesgo
 epica: EP-002
 prioridad: Must
 complejidad: M
-estado: borrador
+estado: lista
 ---
 
 # HU-005 — Detectar automáticamente proyectos en riesgo

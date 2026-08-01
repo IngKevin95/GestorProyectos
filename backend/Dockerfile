@@ -14,7 +14,7 @@ COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY backend/app ./app
+COPY backend/src ./src
 COPY backend/db ./db
 
 # Expose port
@@ -25,4 +25,4 @@ HEALTHCHECK --interval=5s --timeout=5s --start-period=10s --retries=3 \
   CMD python -c "import requests; requests.get('http://localhost:8000/health', timeout=2)" || exit 1
 
 # Run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]

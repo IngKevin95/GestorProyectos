@@ -14,7 +14,7 @@ async def test_create_project_endpoint_accepts_new_fields(client: AsyncClient):
     # Nota: Este test falla si no hay autenticación
     # Por ahora solo verifica que el endpoint existe
     response = await client.post(
-        "/projects",
+        "/api/v1/projects",
         json={
             "name": "Test Project",
             "bac": 10000.0,
@@ -34,10 +34,10 @@ async def test_create_project_endpoint_accepts_new_fields(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_list_projects_endpoint_exists(client: AsyncClient):
-    """Verificar que GET /projects existe"""
-    response = await client.get("/projects")
-    # Esperamos 401 (sin auth) o 200 (con auth)
-    assert response.status_code in [200, 401], f"Unexpected status: {response.status_code}"
+    """Verificar que GET /api/v1/projects existe"""
+    response = await client.get("/api/v1/projects")
+    # Esperamos 401 (sin auth), 422 (missing auth header) o 200 (con auth)
+    assert response.status_code in [200, 401, 422], f"Unexpected status: {response.status_code}"
 
 
 @pytest.mark.asyncio

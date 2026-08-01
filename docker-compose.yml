@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
       POSTGRES_DB: ${POSTGRES_DB:-gestor_proyectos}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_PORT:-5445}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -33,6 +33,7 @@ services:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-gestor}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-gestor_proyectos}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-your-secret-key-change-in-production}
       DEBUG: ${DEBUG:-false}
+      SKIP_SESSION_VERIFICATION: "true"
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     depends_on:

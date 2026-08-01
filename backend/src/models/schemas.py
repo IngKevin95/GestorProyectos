@@ -76,12 +76,7 @@ class UserUpdate(BaseModel):
 # All available permission keys in the system
 ALL_PERMISSIONS = [
     "projects.create", "projects.read", "projects.update", "projects.delete",
-    "phases.create", "phases.read", "phases.update", "phases.delete",
-    "departments.create", "departments.read", "departments.update", "departments.delete",
-    "activities.create", "activities.read", "activities.update", "activities.delete",
-    "activities.edit_estimates",
-    "evm.read", "audit.read", "csv.import", "csv.export",
-    "webhooks.manage", "users.manage", "roles.manage",
+    "audit.read", "webhooks.manage", "users.manage", "roles.manage",
 ]
 
 
@@ -199,6 +194,8 @@ ProjectStatus = Literal["Activo", "En Pausa", "Completado", "Cancelado"]
 ProjectPriority = Literal["Alta", "Media", "Baja"]
 ProjectType = Literal["Mantenimiento", "Recurrente", "Diagnóstico", "Proyecto"]
 
+PriorityStrategy = Literal["relative", "absolute", "mixed"]
+
 VALID_TRANSITIONS: dict[str, list[str]] = {
     "PLANNING": ["ACTIVE", "CANCELLED"],
     "ACTIVE": ["PAUSED", "COMPLETED", "CANCELLED"],
@@ -219,6 +216,16 @@ class ProjectCreate(BaseModel):
     bloqueos: Optional[str] = Field(None, max_length=1000)
     notas: Optional[str] = Field(None, max_length=5000)
     tipo_proyecto: Optional[ProjectType] = None
+    priority_strategy: Optional[PriorityStrategy] = "relative"
+    priority_constant: Optional[float] = Field(0.0, ge=0, le=100)
+    business_value: Optional[float] = Field(0.0, ge=0, le=100)
+
+    @field_validator("priority_constant")
+    @classmethod
+    def validate_priority_constant(cls, v: float | None) -> float | None:
+        if v is not None and (v < 0 or v > 100):
+            raise ValueError("priority_constant must be between 0 and 100")
+        return v
 
 
 class ProjectUpdate(BaseModel):
@@ -235,7 +242,17 @@ class ProjectUpdate(BaseModel):
     bloqueos: Optional[str] = Field(None, max_length=1000)
     notas: Optional[str] = Field(None, max_length=5000)
     tipo_proyecto: Optional[ProjectType] = None
+    priority_strategy: Optional[PriorityStrategy] = None
+    priority_constant: Optional[float] = Field(None, ge=0, le=100)
+    business_value: Optional[float] = Field(None, ge=0, le=100)
     version: int
+
+    @field_validator("priority_constant")
+    @classmethod
+    def validate_priority_constant(cls, v: float | None) -> float | None:
+        if v is not None and (v < 0 or v > 100):
+            raise ValueError("priority_constant must be between 0 and 100")
+        return v
 
 
 class ProjectResponse(BaseModel):
@@ -246,13 +263,18 @@ class ProjectResponse(BaseModel):
     completed_effort: float
     state: ProjectState
     responsable: str
-    estado: ProjectStatus
+    status: ProjectStatus
     prioridad: Optional[ProjectPriority] = None
     fecha_limite: Optional[date] = None
     siguiente_paso: Optional[str] = None
     bloqueos: Optional[str] = None
     notas: Optional[str] = None
     tipo_proyecto: Optional[ProjectType] = None
+    health_status: str = "ok"  # EP-002: ok, blocked, at_risk, no_next_step
+    priority_strategy: str = "relative"
+    priority_constant: float = 0.0
+    business_value: float = 0.0
+    score: Optional[float] = None
     user_id: uuid.UUID
     version: int
     created_at: datetime
@@ -332,100 +354,6 @@ class ProfileResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# --- Activities ---
-class ActivityCreate(BaseModel):
-    name: str = Field(min_length=1, max_length=255)
-    bac: float = Field(gt=0)                          # Presupuesto manual (siempre requerido)
-    profile_id: Optional[uuid.UUID] = None
-    estimated_hours: Optional[float] = Field(None, ge=0)
-    start_date: Optional[date] = None
-    end_date: Optional[date] = None
-    percentage_completed: float = Field(default=0, ge=0, le=100)
-    actual_cost: Optional[float] = Field(None, ge=0)  # None → se calcula desde perfil × horas
-
-    @model_validator(mode="after")
-    def validate_profile_fields(self) -> "ActivityCreate":
-        has_profile = self.profile_id is not None
-        has_hours = self.estimated_hours is not None
-        if has_profile != has_hours:
-            raise ValueError("profile_id and estimated_hours must both be provided or both omitted")
-        return self
-
-
-class ActivityUpdate(BaseModel):
-    name: Optional[str] = Field(None, min_length=1, max_length=255)
-    bac: Optional[float] = Field(None, gt=0)
-    profile_id: Optional[uuid.UUID] = None
-    estimated_hours: Optional[float] = Field(None, ge=0)
-    start_date: Optional[date] = None
-    end_date: Optional[date] = None
-    percentage_completed: Optional[float] = Field(None, ge=0, le=100)
-    actual_cost: Optional[float] = Field(None, ge=0)
-    version: int
-
-
-class ActivityResponse(BaseModel):
-    id: uuid.UUID
-    department_id: uuid.UUID
-    name: str
-    bac: float
-    profile_id: Optional[uuid.UUID] = None
-    estimated_hours: Optional[float] = None
-    profile_name: Optional[str] = None
-    hourly_rate: Optional[float] = None
-    start_date: Optional[date] = None
-    end_date: Optional[date] = None
-    percentage_planned: float         # Calculado dinámicamente desde fechas
-    percentage_completed: float
-    actual_cost: float
-    version: int
-    created_at: datetime
-
-    model_config = {"from_attributes": True}
-
-
-# --- Activity Logs ---
-class ActivityLogCreate(BaseModel):
-    logged_date: date
-    hours_worked: float = Field(ge=0)
-    percentage_completed: float = Field(ge=0, le=100)
-    notes: Optional[str] = Field(None, max_length=1000)
-    profile_id: Optional[str] = None  # Perfil que trabajó → calcula AC real
-
-
-class ActivityLogResponse(BaseModel):
-    id: uuid.UUID
-    activity_id: uuid.UUID
-    logged_date: date
-    hours_worked: float
-    percentage_completed: float
-    notes: Optional[str] = None
-    profile_id: Optional[uuid.UUID] = None
-    profile_name: Optional[str] = None
-    hourly_rate: Optional[float] = None
-    actual_cost_entry: Optional[float] = None  # hours_worked × hourly_rate de este registro
-    created_by: uuid.UUID
-    created_at: datetime
-
-    model_config = {"from_attributes": True}
-
-
-# --- EVM Indicators ---
-class EVMResponse(BaseModel):
-    pv: float
-    ev: float
-    ac: float
-    bac: float
-    cv: Optional[float]
-    sv: Optional[float]
-    cpi: Optional[float]
-    spi: Optional[float]
-    eac: Optional[float]
-    vac: Optional[float]
-    cpi_status: Literal["green", "yellow", "red", "neutral"]
-    spi_status: Literal["green", "yellow", "red", "neutral"]
-    ac_status: Literal["green", "yellow", "red", "neutral"] = "neutral"
-    as_of: Optional[datetime] = None
 
 
 # --- Webhooks ---
@@ -462,12 +390,3 @@ class AuditLogResponse(BaseModel):
     changed_at: datetime
 
     model_config = {"from_attributes": True}
-
-
-# ──────────────────────────────────────────
-# CSV Import
-# ──────────────────────────────────────────
-class CSVImportResult(BaseModel):
-    imported: int
-    errors: list[dict[str, Any]] = []
-    project_id: uuid.UUID

@@ -4,7 +4,7 @@ titulo: Configurar estrategia de priorización por proyecto
 epica: EP-003
 prioridad: Must
 complejidad: M
-estado: borrador
+estado: lista
 dependencias: [HU-008]
 ---
 

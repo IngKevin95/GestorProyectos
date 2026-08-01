@@ -88,6 +88,20 @@ class Project(Base):
     bloqueos: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
     notas: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     tipo_proyecto: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)  # Mantenimiento, Recurrente, Diagnóstico, Proyecto
+    # Health detection (EP-002)
+    health_status: Mapped[str] = mapped_column(
+        Enum("ok", "blocked", "at_risk", "no_next_step", name="project_health_status"),
+        nullable=False,
+        default="ok"
+    )
+    # Priority configuration (EP-003)
+    priority_strategy: Mapped[str] = mapped_column(
+        Enum("relative", "absolute", "mixed", name="priority_strategy_enum"),
+        nullable=False,
+        default="relative"
+    )
+    priority_constant: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False, default=0.0)
+    business_value: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False, default=0.0)
     # ---
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey(_FK_USERS_ID), nullable=False)
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
@@ -96,85 +110,6 @@ class Project(Base):
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
     owner: Mapped["User"] = relationship("User", back_populates="projects")
-    phases: Mapped[list["Phase"]] = relationship("Phase", back_populates="project")
-
-
-# --- PHASES ---
-class Phase(Base):
-    __tablename__ = "phases"
-    __table_args__ = (
-        CheckConstraint(_CK_BAC_POSITIVE, name="ck_phases_bac_positive"),
-        Index("idx_phases_project_id", "project_id"),
-        Index("idx_phases_project_deleted", "project_id", "deleted_at"),
-    )
-
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id"), nullable=False)
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
-    bac: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False)
-    version: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
-    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-
-    project: Mapped["Project"] = relationship("Project", back_populates="phases")
-    departments: Mapped[list["Department"]] = relationship("Department", back_populates="phase")
-
-
-# --- DEPARTMENTS ---
-class Department(Base):
-    __tablename__ = "departments"
-    __table_args__ = (
-        CheckConstraint(_CK_BAC_POSITIVE, name="ck_departments_bac_positive"),
-        Index("idx_departments_phase_id", "phase_id"),
-        Index("idx_departments_phase_deleted", "phase_id", "deleted_at"),
-    )
-
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    phase_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("phases.id"), nullable=False)
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
-    bac: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False)
-    version: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
-    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-
-    phase: Mapped["Phase"] = relationship("Phase", back_populates="departments")
-    activities: Mapped[list["Activity"]] = relationship("Activity", back_populates="department")
-
-
-# --- ACTIVITIES ---
-class Activity(Base):
-    __tablename__ = "activities"
-    __table_args__ = (
-        CheckConstraint(_CK_BAC_POSITIVE, name="ck_activities_bac_positive"),
-        CheckConstraint("percentage_planned >= 0 AND percentage_planned <= 100", name="ck_activities_planned_range"),
-        CheckConstraint("percentage_completed >= 0 AND percentage_completed <= 100", name="ck_activities_completed_range"),
-        CheckConstraint("actual_cost >= 0", name="ck_activities_actual_cost_positive"),
-        Index("idx_activities_department_id", "department_id"),
-        Index("idx_activities_dept_deleted", "department_id", "deleted_at"),
-        Index("idx_activities_dept_completed", "department_id", "percentage_completed"),
-    )
-
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    department_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("departments.id"), nullable=False)
-    profile_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey(_FK_PROFILES_ID), nullable=True)
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
-    bac: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False)
-    estimated_hours: Mapped[Optional[float]] = mapped_column(Numeric(10, 2), nullable=True)
-    start_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
-    end_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
-    percentage_planned: Mapped[float] = mapped_column(Numeric(5, 2), nullable=False, default=0)
-    percentage_completed: Mapped[float] = mapped_column(Numeric(5, 2), nullable=False, default=0)
-    actual_cost: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False, default=0)
-    version: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
-    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-
-    department: Mapped["Department"] = relationship("Department", back_populates="activities")
-    profile: Mapped[Optional["Profile"]] = relationship("Profile", back_populates="activities")
-    logs: Mapped[list["ActivityLog"]] = relationship("ActivityLog", back_populates="activity", cascade="all, delete-orphan", lazy="noload")
 
 
 # --- AUDIT LOG (inmutable) ---
@@ -196,27 +131,6 @@ class AuditLog(Base):
     new_value: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
     changed_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey(_FK_USERS_ID), nullable=False)
     changed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
-
-
-# --- ACTIVITY LOGS ---
-class ActivityLog(Base):
-    __tablename__ = "activity_logs"
-    __table_args__ = (
-        Index("ix_activity_logs_activity_id", "activity_id"),
-    )
-
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    activity_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("activities.id", ondelete="CASCADE"), nullable=False)
-    logged_date: Mapped[date] = mapped_column(Date, nullable=False)
-    hours_worked: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False, default=0)
-    percentage_completed: Mapped[float] = mapped_column(Numeric(5, 2), nullable=False)
-    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    profile_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey(_FK_PROFILES_ID, ondelete="SET NULL"), nullable=True)
-    created_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey(_FK_USERS_ID), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
-
-    activity: Mapped["Activity"] = relationship("Activity", back_populates="logs")
-    profile: Mapped[Optional["Profile"]] = relationship("Profile", lazy="noload")
 
 
 # --- WEBHOOKS ---
@@ -321,8 +235,6 @@ class Profile(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-
-    activities: Mapped[list["Activity"]] = relationship("Activity", back_populates="profile")
 
 
 # --- ROLES ---
