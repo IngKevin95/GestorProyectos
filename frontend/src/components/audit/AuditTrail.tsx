@@ -65,23 +65,6 @@ export function AuditTrail({ projectId }: Readonly<{ projectId: string }>) {
     <div className="space-y-4">
       {/* Filter bar */}
       <div className="flex items-center gap-3 flex-wrap">
-        <span className="text-sm font-medium text-gray-600">Filtrar:</span>
-        <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
-          {ENTITY_TYPES.map((type) => (
-            <button
-              key={type}
-              type="button"
-              onClick={() => setEntityFilter(type)}
-              className={`px-3 py-1.5 text-xs rounded-md font-medium transition ${
-                entityFilter === type
-                  ? "bg-white shadow text-gray-900"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              {type === "ALL" ? "Todos" : type.charAt(0) + type.slice(1).toLowerCase()}
-            </button>
-          ))}
-        </div>
 
         {/* Search */}
         <div className="relative ml-auto">
