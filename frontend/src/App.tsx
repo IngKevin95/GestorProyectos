@@ -6,11 +6,7 @@ import { Dashboard } from "./components/Dashboard";
 import { LoginPage } from "./pages/LoginPage";
 import { ProjectsPage } from "./pages/ProjectsPage";
 import { ProjectDetailPage } from "./pages/ProjectDetailPage";
-import { ProfilePage } from "./pages/ProfilePage";
 import { AdminPage } from "./pages/AdminPage";
-import { SettingsPage } from "./pages/SettingsPage";
-import { TemplatesPage } from "./pages/TemplatesPage";
-import { ProfilesPage } from "./pages/ProfilesPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { useAuthStore } from "./store/authStore";
 import { useSettingsStore } from "./store/settingsStore";
@@ -59,42 +55,10 @@ export default function App() {
           }
         />
         <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/admin"
           element={
             <ProtectedRoute>
               <AdminPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <SettingsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/templates"
-          element={
-            <ProtectedRoute>
-              <TemplatesPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profiles"
-          element={
-            <ProtectedRoute>
-              <ProfilesPage />
             </ProtectedRoute>
           }
         />

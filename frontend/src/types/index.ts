@@ -28,7 +28,7 @@ export interface Project {
   responsable?: string;
   estado?: string;
   prioridad?: string;
-  fecha_límite?: string;
+  fecha_limite?: string;
   siguiente_paso?: string;
   bloqueos?: string;
   notas?: string;
