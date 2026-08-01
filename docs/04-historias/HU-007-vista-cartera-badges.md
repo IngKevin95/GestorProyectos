@@ -4,7 +4,7 @@ titulo: Mostrar vista de cartera con badges de salud
 epica: EP-003
 prioridad: Must
 complejidad: M
-estado: borrador
+estado: lista
 ---
 
 # HU-007 — Mostrar vista de cartera con badges de salud

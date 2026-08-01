@@ -4,7 +4,7 @@ titulo: Ordenar vista de cartera por score de priorización
 epica: EP-003
 prioridad: Must
 complejidad: M
-estado: borrador
+estado: lista
 ---
 
 # HU-008 — Ordenar vista de cartera por score de priorización
