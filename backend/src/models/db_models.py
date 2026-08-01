@@ -102,6 +102,9 @@ class Project(Base):
     )
     priority_constant: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False, default=0.0)
     business_value: Mapped[float] = mapped_column(Numeric(15, 2), nullable=False, default=0.0)
+    # Task statistics (EP-004)
+    open_tasks: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    overdue_tasks: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     # ---
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey(_FK_USERS_ID), nullable=False)
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
@@ -110,6 +113,7 @@ class Project(Base):
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
     owner: Mapped["User"] = relationship("User", back_populates="projects")
+    tasks: Mapped[list["Task"]] = relationship("Task", back_populates="project", cascade="all, delete-orphan")
 
 
 # --- AUDIT LOG (inmutable) ---
@@ -272,3 +276,32 @@ class ProjectTemplate(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
 
+
+# --- TASKS (EP-004) ---
+class Task(Base):
+    __tablename__ = "tasks"
+    __table_args__ = (
+        Index("idx_tasks_project_id", "project_id"),
+        Index("idx_tasks_project_status", "project_id", "status"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id"), nullable=False)
+    title: Mapped[str] = mapped_column(String(500), nullable=False)
+    status: Mapped[str] = mapped_column(
+        Enum("abierta", "vencida", "bloqueada", "cerrada", name="task_status"),
+        nullable=False,
+        default="abierta"
+    )
+    assignee: Mapped[str] = mapped_column(String(255), nullable=False)
+    priority: Mapped[str] = mapped_column(
+        Enum("alta", "media", "baja", name="task_priority"),
+        nullable=False,
+        default="media"
+    )
+    due_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+
+    project: Mapped["Project"] = relationship("Project", back_populates="tasks")
