@@ -4,6 +4,7 @@ FastAPI app — entry point con todos los routers y middleware.
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.openapi.docs import get_swagger_ui_html
 import os
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -65,11 +66,31 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="GestorProyectos API",
     version="1.0.0",
-    docs_url="/api-docs" if not settings.is_production else None,
-    redoc_url="/api-redoc" if not settings.is_production else None,
-    openapi_url="/api/openapi.json" if not settings.is_production else None,
+    docs_url=None,
+    redoc_url="/api-redoc",
+    openapi_url="/api/openapi.json",
     lifespan=lifespan,
 )
+
+from fastapi.responses import FileResponse
+
+@app.get("/api-docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=app.title + " - Swagger UI",
+        oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
+        swagger_js_url="/api/static/swagger-ui-bundle.js",
+        swagger_css_url="/api/static/swagger-ui.css",
+    )
+
+@app.get("/api/static/swagger-ui-bundle.js", include_in_schema=False)
+async def swagger_js():
+    return FileResponse("src/static/swagger-ui-bundle.js")
+
+@app.get("/api/static/swagger-ui.css", include_in_schema=False)
+async def swagger_css():
+    return FileResponse("src/static/swagger-ui.css")
 
 # ── Middleware ──────────────────────────────────────────────
 app.add_middleware(SecurityHeadersMiddleware)
