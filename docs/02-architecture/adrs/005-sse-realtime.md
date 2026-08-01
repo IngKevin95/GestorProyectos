@@ -1,6 +1,6 @@
 # ADR 005: Sincronizaci�n Real-Time con SSE
 
-**Status:** Accepted
+**Status:** Superseded (por ADR 016)
 **Date:** 2026-07-31
 
 ## Contexto y Problema
