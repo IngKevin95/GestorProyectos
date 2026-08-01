@@ -1,0 +1,362 @@
+{
+  "info": {
+    "name": "EP-001 CRUD API Contracts",
+    "description": "Contract tests for Projects CRUD endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "POST /projects - Create (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 201', function() {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "pm.test('Response has id, nombre, responsable, estado, prioridad, tipo_proyecto', function() {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData).to.have.property('id');",
+              "  pm.expect(jsonData).to.have.property('name');",
+              "  pm.expect(jsonData).to.have.property('responsable');",
+              "  pm.expect(jsonData).to.have.property('status');",
+              "  pm.expect(jsonData).to.have.property('prioridad');",
+              "  pm.expect(jsonData).to.have.property('tipo_proyecto');",
+              "});",
+              "pm.test('responsable is not empty', function() {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData.responsable).not.to.be.empty;",
+              "});",
+              "pm.test('estado is in enum', function() {",
+              "  const jsonData = pm.response.json();",
+              "  const validStates = ['Activo', 'En Pausa', 'Cancelado', 'Completado'];",
+              "  pm.expect(validStates).to.include(jsonData.status);",
+              "});",
+              "if (pm.response.code === 201) {",
+              "  const jsonData = pm.response.json();",
+              "  pm.collectionVariables.set('project_id', jsonData.id);",
+              "  pm.collectionVariables.set('project_version', jsonData.version);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"responsable\": \"Alice\", \"estado\": \"Activo\", \"prioridad\": \"Alta\", \"fecha_limite\": \"2026-12-31\", \"siguiente_paso\": \"Revisar brief\", \"bloqueos\": \"Pendiente aprobaci\\u00f3n\", \"notas\": \"Test\", \"tipo_proyecto\": \"Diagn\\u00f3stico\", \"name\": \"Proyecto Test\", \"total_effort\": 100}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/v1/projects",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "projects"
+          ]
+        }
+      }
+    },
+    {
+      "name": "GET /projects - List (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function() {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Response is array', function() {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData.data).to.be.an('array');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8000/api/v1/projects",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "projects"
+          ]
+        }
+      }
+    },
+    {
+      "name": "GET /projects?estado=Activo - Filter by estado (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function() {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('All returned projects have estado=Activo', function() {",
+              "  const jsonData = pm.response.json();",
+              "  jsonData.data.forEach(function(project) {",
+              "    pm.expect(project.status).to.equal('Activo');",
+              "  });",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8000/api/v1/projects?status=Activo",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "projects"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "Activo"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "GET /projects/{id} - Get detail (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function() {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Response has all project fields', function() {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData).to.have.property('id');",
+              "  pm.expect(jsonData).to.have.property('name');",
+              "  pm.expect(jsonData).to.have.property('responsable');",
+              "  pm.expect(jsonData).to.have.property('status');",
+              "  pm.expect(jsonData).to.have.property('prioridad');",
+              "  pm.expect(jsonData).to.have.property('fecha_limite');",
+              "  pm.expect(jsonData).to.have.property('siguiente_paso');",
+              "  pm.expect(jsonData).to.have.property('bloqueos');",
+              "  pm.expect(jsonData).to.have.property('notas');",
+              "  pm.expect(jsonData).to.have.property('tipo_proyecto');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8000/api/v1/projects/{{project_id}}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "projects",
+            "{{project_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "GET /projects/{id} - Not found (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 404', function() {",
+              "  pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8000/api/v1/projects/e1bca744-5ab6-4df9-9de5-23e263db3799",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "projects",
+            "e1bca744-5ab6-4df9-9de5-23e263db3799"
+          ]
+        }
+      }
+    },
+    {
+      "name": "PUT /projects/{id} - Update (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function() {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Updated fields are reflected', function() {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData.status).to.equal('En Pausa');",
+              "  pm.expect(jsonData.siguiente_paso).to.equal('Esperar feedback');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"estado\":\"En Pausa\",\"siguiente_paso\":\"Esperar feedback\",\"version\":{{project_version}}}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/v1/projects/{{project_id}}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "projects",
+            "{{project_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "DELETE /projects/{id} - Delete (204)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 204', function() {",
+              "  pm.response.to.have.status(204);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "http://localhost:8000/api/v1/projects/{{project_id}}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "projects",
+            "{{project_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "POST /projects - Validation: missing responsable (422)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 400', function() {",
+              "  pm.response.to.have.status(422);",
+              "});",
+              "pm.test('Error message mentions responsable', function() {",
+              "  const responseText = pm.response.text();",
+              "  pm.expect(responseText.toLowerCase()).to.include('responsable');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"estado\": \"Activo\", \"prioridad\": \"Alta\", \"tipo_proyecto\": \"Proyecto\", \"name\": \"Proyecto Sin Responsable\", \"total_effort\": 100}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/v1/projects",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "v1",
+            "projects"
+          ]
+        }
+      }
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAwNmIyYi0yMDIzLTQ2ZjQtYjMwMC1iNDQ5MmZhNzAwNzYiLCJlbWFpbCI6ImFkbWluQGVtcHJlc2EuY29tIiwicm9sZSI6ImFkbWluIiwidHlwZSI6ImFjY2VzcyIsImV4cCI6MTc4NTYwNzAyMSwiaWF0IjoxNzg1NjAzNDIxfQ.apHJvm6qMrvle9bYrgYZ9k6OTm-0VDWdmHUFd92Oo8M",
+        "type": "string"
+      }
+    ]
+  }
+}
