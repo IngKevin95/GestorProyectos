@@ -15,6 +15,11 @@ export interface Project {
   name: string;
   bac: number;
   state: ProjectState;
+  health_status: string;
+  priority_strategy: string;
+  priority_constant: number;
+  business_value: number;
+  score: number | null;
   user_id: string;
   version: number;
   created_at: string;

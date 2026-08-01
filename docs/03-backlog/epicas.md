@@ -57,8 +57,7 @@ alertas accionables sin revisión manual proyecto por proyecto.
 
 ## EP-003 — Vista de Cartera y Criterio de Priorización
 
-**Resumen**: dashboard con proyectos ordenados por score de priorización, badges de salud, filtros
-básicos, actualizaciones en tiempo real vía SSE, y panel explicativo.
+**Resumen**: dashboard con proyectos ordenados por score de priorización, badges de salud, panel explicativo del criterio y configuración por proyecto de la estrategia de priorización (Relativa, Absoluta, Mixta).
 
 **Por qué existe**: sin un orden explicado, la detección de salud (EP-002) no se traduce en "qué
 atender primero" — el reto pide explícitamente un criterio claro y defendible.
@@ -66,10 +65,9 @@ atender primero" — el reto pide explícitamente un criterio claro y defendible
 **Objetivos PRD que atiende**: "ofrezca una vista de seguimiento con un criterio de priorización
 explícito y defendible" (§5); "mostrar un criterio claro de priorización" (Enunciado).
 
-**Capabilities incluidas**: score de priorización visible, vista de cartera ordenada
-con filtros, SSE (§6 Must); panel de priorización (§5).
+**Capabilities incluidas**: score de priorización visible, vista de cartera ordenada, panel de priorización (§5), configuración de estrategia por proyecto.
 
-**Éxito medible**: evaluador identifica en <30s qué proyectos requieren atención; criterio explicable en una frase (§5); el dashboard refleja cambios en tiempo real (§10 Requisitos Técnicos, SSE).
+**Éxito medible**: evaluador identifica en <30s qué proyectos requieren atención; criterio explicable en una frase (§5); dashboard funcional con badges, scores, y configuración de estrategia persisted en BD.
 
 ---
 

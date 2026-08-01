@@ -1,4 +1,4 @@
-import type { KPIStatus } from "../../types";
+import type { KPIStatus } from "../types";
 
 const STATUS_STYLES: Record<KPIStatus, string> = {
   green: "bg-emerald-50 text-emerald-700",

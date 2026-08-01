@@ -1,0 +1,10 @@
+schema: spec-driven
+created: 2026-08-01
+status: archived
+archived: 2026-08-01
+completion: 100%
+metrics:
+  tdd_tests: 18
+  smoke_tests: 3
+  api_contracts: 5
+  gates_passed: 6

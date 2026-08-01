@@ -18,7 +18,7 @@ async def test_postgres_container_starts_and_accepts_connections():
     try:
         async with await psycopg.AsyncConnection.connect(
             "postgresql://gestor:password@localhost:5432/gestor_proyectos",
-            timeout=5
+            connect_timeout=5
         ) as conn:
             result = await conn.execute("SELECT 1")
             assert result is not None
@@ -33,7 +33,7 @@ async def test_gestor_proyectos_database_exists():
 
     async with await psycopg.AsyncConnection.connect(
         "postgresql://gestor:password@localhost:5432/postgres",
-        timeout=5
+        connect_timeout=5
     ) as conn:
         result = await conn.execute(
             "SELECT 1 FROM pg_database WHERE datname = 'gestor_proyectos'"
@@ -49,7 +49,7 @@ async def test_required_tables_exist():
 
     async with await psycopg.AsyncConnection.connect(
         "postgresql://gestor:password@localhost:5432/gestor_proyectos",
-        timeout=5
+        connect_timeout=5
     ) as conn:
         required_tables = ["projects", "tasks", "team", "audit_log"]
 
@@ -72,7 +72,7 @@ async def test_data_persists_across_restarts():
 
     async with await psycopg.AsyncConnection.connect(
         "postgresql://gestor:password@localhost:5432/gestor_proyectos",
-        timeout=5
+        connect_timeout=5
     ) as conn:
         # Create test table
         await conn.execute("""
@@ -102,7 +102,7 @@ async def test_postgres_health_check():
 
     async with await psycopg.AsyncConnection.connect(
         "postgresql://gestor:password@localhost:5432/postgres",
-        timeout=5
+        connect_timeout=5
     ) as conn:
         # Simple health check query
         result = await conn.execute("SELECT 1 as health")
