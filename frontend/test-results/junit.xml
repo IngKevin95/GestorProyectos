@@ -1,0 +1,39 @@
+<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="1" time="30.453624">
+<testsuite name="ep001-crud.spec.ts" timestamp="2026-08-01T16:47:21.752Z" hostname="chromium" tests="1" failures="0" skipped="0" time="30.05" errors="1">
+<testcase name="CRUD operations for projects" classname="ep001-crud.spec.ts" time="30.05">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|ep001-crud-CRUD-operations-for-projects-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|ep001-crud-CRUD-operations-for-projects-chromium\error-context.md]]
+]]>
+</system-out>
+<error message="Test timeout of 30000ms exceeded." type="Error">
+<![CDATA[  [chromium] › ep001-crud.spec.ts:3:5 › CRUD operations for projects ───────────────────────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('button:has-text("Crear")')
+
+
+       5 |   
+       6 |   // Step 3: Create with missing fields check
+    >  7 |   await page.click('button:has-text("Crear")');
+         |              ^
+       8 |   await expect(page.locator('label', { hasText: 'Total Effort' })).toBeVisible();
+       9 |   await expect(page.locator('label', { hasText: 'Priority Strategy' })).toBeVisible();
+      10 |   await expect(page.locator('label', { hasText: 'Priority Constant' })).toBeVisible();
+        at E:\Datos\Documentos\GitHub Personal\GestorProyectos\frontend\e2e\ep001-crud.spec.ts:7:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\test-results\ep001-crud-CRUD-operations-for-projects-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\test-results\ep001-crud-CRUD-operations-for-projects-chromium\error-context.md
+]]>
+</error>
+</testcase>
+</testsuite>
+</testsuites>
