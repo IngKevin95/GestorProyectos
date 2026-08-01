@@ -138,7 +138,7 @@ Estos elementos requieren arquitectura más compleja (multitenancia, webhooks bi
 ---
 
 ## 11. Requisitos Técnicos
-- **Frontend:** React 18, TypeScript, Vite, Zustand (estado local), Vanilla CSS.
+- **Frontend:** React 18, TypeScript, Vite, Zustand (estado local), Tailwind CSS.
 - **Backend:** FastAPI (Python).
 - **Base de Datos:** PostgreSQL 15+.
 - **Infraestructura:** Docker + docker-compose para setup local reproducible.
@@ -148,7 +148,7 @@ Estos elementos requieren arquitectura más compleja (multitenancia, webhooks bi
 
 ### Principios de Diseño
 - **Legibilidad operativa:** Prioridad 1 = información rápida (tiempo de visibilidad <3s).
-- **Estilización:** Vanilla CSS con variables de diseño (CSS custom properties). Máximo control para micro-animaciones, glassmorphism y paletas HSL. Véase ADR-009 para justificación técnica.
+- **Estilización:** Tailwind CSS con variables de diseño (CSS custom properties). Máximo control para micro-animaciones, glassmorphism y paletas HSL. Véase ADR-009 para justificación técnica.
 - **Accesibilidad WCAG AA:** Validado con axe DevTools en CI.
 - **Componentes modulares simples:** Reutilización, no API compleja.
 
@@ -160,7 +160,7 @@ Estos elementos requieren arquitectura más compleja (multitenancia, webhooks bi
 - **Texto primario:** #1F2937 (dark) / #F9FAFB (light) — ratio WCAG AA ≥4.5:1.
 - **Fondo:** #FFFFFF (light mode) / #111827 (dark mode).
 
-### Design Tokens (Vanilla CSS)
+### Design Tokens (Tailwind CSS)
 - **Spacing:** Multiples de 4px (`--space-xs: 4px, --space-sm: 8px, --space-md: 16px, --space-lg: 24px, --space-xl: 32px`).
 - **Border Radius:** Componentes: `--radius-sm: 4px`, Cards: `--radius-md: 8px`, Buttons: `--radius-sm`.
 - **Shadows:** Tarjetas: `--shadow-sm: 0 1px 2px rgba(0,0,0,0.05)`, Hover: `--shadow-lg: 0 20px 25px rgba(0,0,0,0.1)`.

@@ -1,24 +1,24 @@
-# ADR 009: Estrategia de Estilos Frontend (Vanilla CSS)
+# ADR 009: Estrategia de Estilos Frontend (Tailwind CSS)
 
 **Status:** Accepted
-**Date:** 2026-07-31
+**Date:** 2026-08-01
 
 ## Contexto y Problema
-El frontend debe presentar un dise�o "premium, moderno y vivo" (micro-animaciones, glassmorphism, paletas HSL) garantizando una experiencia de usuario espectacular. Al mismo tiempo, se debe elegir un sistema de estáilizaci�n acorde a la meta del MVP.
+El frontend debe presentar un diseño "premium, moderno y vivo" (micro-animaciones, glassmorphism, paletas HSL) garantizando una experiencia de usuario espectacular. Al mismo tiempo, se debe elegir un sistema de estilización acorde a la meta del MVP, y la codebase actual ya incluye Tailwind en su configuración (`tailwind.config.js`).
 
 ## Alternativas Consideradas
-1. **Librer�as de Componentes (MUI, Bootstrap)**: R�pidas, pero imponen un dise�o gen�rico y r�gido que dificulta el requerimiento de "está�tica premium �nica".
-2. **Tailwind CSS**: Acelera el desarrollo mediante utility classes, pero el usuario no ha solicitado expl�citamente su uso, y puede ensuciar el marcado (HTML) dificultando el control fino de micro-animaciones personalizadas en un equipo peque�o.
-3. **Vanilla CSS (CSS Modules o Globales estructurados)**: Est�ndar web nativo. Ofrece el m�ximo control sobre variables CSS, animaciones precisas y dise�o personalizado sin dependencias de compilaci�n adicionales.
+1. **Librerías de Componentes (MUI, Bootstrap)**: Rápidas, pero imponen un diseño genérico y rígido que dificulta el requerimiento de "estética premium única".
+2. **Vanilla CSS**: Máximo control, pero requiere mayor tiempo de desarrollo para crear grillas, utilidades de spacing y responsividad que vienen de caja en otros frameworks.
+3. **Tailwind CSS**: Acelera el desarrollo mediante utility classes, permite sobreescribir la paleta de colores por defecto en `tailwind.config.js` y mantiene un control granular equivalente a CSS al permitir utilidades a medida y `@layer` components.
 
 ## Decisión
-Se emplear� **Vanilla CSS** (estructurado con variables CSS y tokens de dise�o) como estárategia principal de estáilizaci�n, evitando frameworks intrusivos a menos que se escale el equipo.
+Se empleará **Tailwind CSS** como estrategia principal de estilización, con la paleta de colores sobreescrita en `tailwind.config.js` para asegurar la gama "Deep Pine & Gold" y evitar la dependencia visual del diseño por defecto de Tailwind.
 
 ## Justificación
-- Alineaci�n directa con los requerimientos de dise�o premium: permite control granular absoluto sobre micro-animaciones, efectos de hover y paletas complejas.
-- Cero dependencias adicionales en el *build step* de Vite.
-- Fomenta la creación de un sistema de dise�o propio basado en propiedades custom (`--color-primary`, `--transition-smooth`), logrando está�tica �nica no gen�rica.
+- Alineación directa con los requerimientos de velocidad del MVP, reutilizando la infraestructura actual.
+- Al sobreescribir la configuración base, se logra la estética única premium (evitando el típico "look Tailwind").
+- Fácil limpieza de clases *hardcodeadas* centralizando tokens en el config y usando clases de utilidad, reduciendo el tamaño del bundle.
 
 ## Consecuencias
-- **Positivas**: M�xima flexibilidad y control. Interfaces �nicas (wow-factor). Archivos HTML/JSX más limpios.
-- **Negativas**: Requiere mayor disciplina por parte del desarrollador para mantener la estáructura CSS organizada y no re-inventar utilidades comunes.
+- **Positivas**: Desarrollo más rápido. Facilidad para ajustar responsividad y layout. Consistencia a través de la configuración global (`tailwind.config.js`).
+- **Negativas**: Los archivos JSX pueden tener clases largas (utility bloat). Requiere disciplina para extraer componentes complejos a `@apply` cuando se requiera limpieza de marcado.
