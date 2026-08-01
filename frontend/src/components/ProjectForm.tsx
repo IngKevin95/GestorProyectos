@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Project } from "../types";
 import { Modal } from "./Modal";
+import { useAdminStore } from "../store/adminStore";
 
 interface ProjectFormProps {
   open: boolean;
@@ -45,12 +46,29 @@ export function ProjectForm({ open, project, onSubmit, onClose, isLoading }: Pro
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showAdvanced, setShowAdvanced] = useState(false);
 
+  const { users, fetchUsers } = useAdminStore();
+
+  useEffect(() => {
+    if (open && users.length === 0) {
+      fetchUsers();
+    }
+  }, [open, users.length, fetchUsers]);
+
   const priorityStrategiesRequiringConstant = ["absolute"];
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.nombre.trim()) newErrors.nombre = "El nombre es requerido";
+    if (formData.nombre.length > 255) newErrors.nombre = "El nombre es muy largo";
     if (!formData.responsable.trim()) newErrors.responsable = "El responsable es requerido";
+    if (!ESTADOS.includes(formData.estado)) newErrors.estado = "Estado inválido";
+    if (!PRIORIDADES.includes(formData.prioridad)) newErrors.prioridad = "Prioridad inválida";
+    if (!TIPOS.includes(formData.tipo_proyecto)) newErrors.tipo_proyecto = "Tipo de proyecto inválido";
+    
+    if (formData.fecha_limite) {
+      const isIso = /^\d{4}-\d{2}-\d{2}$/.test(formData.fecha_limite);
+      if (!isIso) newErrors.fecha_limite = "Formato de fecha inválido";
+    }
     return newErrors;
   };
 
@@ -63,7 +81,7 @@ export function ProjectForm({ open, project, onSubmit, onClose, isLoading }: Pro
     }
 
     try {
-      const payload: any = {
+      const payload: Record<string, any> = {
         name: formData.nombre,
         responsable: formData.responsable,
         estado: formData.estado,
@@ -129,13 +147,20 @@ export function ProjectForm({ open, project, onSubmit, onClose, isLoading }: Pro
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Responsable *</label>
-            <input
-              type="text"
-              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+            <select
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all appearance-none"
               value={formData.responsable}
               onChange={(e) => setFormData({ ...formData, responsable: e.target.value })}
-              placeholder="Nombre del responsable"
-            />
+            >
+              <option value="">Selecciona un usuario</option>
+              {users.map((user) => (
+                <option key={user.id} value={user.email}>{user.email}</option>
+              ))}
+              {/* Fallback en caso de que el responsable actual no sea un email válido pero esté asignado */}
+              {formData.responsable && !users.find(u => u.email === formData.responsable) && (
+                <option value={formData.responsable}>{formData.responsable}</option>
+              )}
+            </select>
             {errors.responsable && <p className="text-red-500 text-xs mt-1 font-medium">{errors.responsable}</p>}
           </div>
 

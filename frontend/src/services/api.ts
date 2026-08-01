@@ -7,6 +7,7 @@ import { useAuthStore } from "../store/authStore";
 
 interface RetryableRequest extends InternalAxiosRequestConfig {
   _retry?: boolean;
+  retryCount?: number;
 }
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? "/api/v1";
@@ -43,10 +44,15 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue = [];
 };
 
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000; // ms
+
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as RetryableRequest;
+
+    if (!originalRequest) throw error;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
@@ -85,6 +91,26 @@ api.interceptors.response.use(
         throw refreshError;
       } finally {
         isRefreshing = false;
+      }
+    }
+
+    // Retry logic for transient errors
+    const status = error.response?.status;
+    const isTransient =
+      !error.response ||
+      status === 408 ||
+      status === 429 ||
+      (status && status >= 500 && status < 600) ||
+      error.code === 'ECONNABORTED' ||
+      error.code === 'ENOTFOUND';
+
+    if (isTransient && originalRequest.method?.toLowerCase() === 'get') {
+      if (!originalRequest.retryCount) originalRequest.retryCount = 0;
+      if (originalRequest.retryCount < MAX_RETRIES) {
+        originalRequest.retryCount += 1;
+        const delay = RETRY_DELAY * Math.pow(2, originalRequest.retryCount - 1);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return api(originalRequest);
       }
     }
 

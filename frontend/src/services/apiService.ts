@@ -3,6 +3,8 @@ import api from "./api";
 export { api };
 import type {
   Project,
+  ProjectInput,
+  ProjectUpdate,
   Phase,
   Department,
   Activity,
@@ -42,12 +44,12 @@ export async function getProject(id: string) {
   return data;
 }
 
-export async function createProject(payload: any) {
+export async function createProject(payload: ProjectInput) {
   const { data } = await api.post<Project>("/projects", payload);
   return data;
 }
 
-export async function updateProject(id: string, payload: any) {
+export async function updateProject(id: string, payload: ProjectUpdate) {
   const { data } = await api.put<Project>(`/projects/${id}`, payload);
   return data;
 }
