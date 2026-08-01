@@ -1,0 +1,13 @@
+FROM postgres:15-alpine
+
+# Environment variables set by docker-compose
+ENV POSTGRES_USER=gestor
+ENV POSTGRES_PASSWORD=password
+ENV POSTGRES_DB=gestor_proyectos
+
+# Copy initialization script
+COPY backend/db/init.sql /docker-entrypoint-initdb.d/01-init.sql
+
+# Health check
+HEALTHCHECK --interval=5s --timeout=5s --start-period=5s --retries=3 \
+  CMD pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
