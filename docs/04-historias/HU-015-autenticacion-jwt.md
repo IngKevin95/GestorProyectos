@@ -4,7 +4,7 @@ titulo: Inicio de sesión seguro
 epica: EP-006
 prioridad: Must
 complejidad: M
-estado: borrador
+estado: lista
 ---
 
 # HU-015 — Inicio de sesión seguro
