@@ -216,3 +216,56 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ── factory-vertical (auto) ───────────────────────────
+.claude/skills/factory/
+.claude/agents/factory/
+.claude/hooks/factory.json
+.claude/.factory-version
+docs/.flow-state.json
+docs/.factory-suggestions.md
+# docs/.reviews/ now includes audit reports — tracked selectively
+# ── /factory-vertical ─────────────────────────────────
+
+# ── factory-arch-vertical (auto) ───────────────────────
+.claude/skills/factory-arch/
+.claude/agents/factory-arch/
+.claude/hooks/arch.json
+.claude/.arch-version
+docs/.arch-flow-state.json
+docs/.arch-suggestions.md
+# docs/.reviews/ now includes audit reports — tracked selectively
+# ── /factory-arch-vertical ─────────────────────────────
+
+# ── factory-build-harness (auto) ───────────────────────
+.claude/state/build-state.json
+# ── /factory-build-harness ──────────────────────
+
+# ── Fabrica Agentica: artefactos internos (no forman parte del reto) ──
+.claude/*
+.agents/
+.claudeignore
+node_modules/
+package.json
+package-lock.json
+.code-review-graph/
+*.tgz
+install-factories.ps1
+release-factories.ps1
+rename_*.ps1
+INTEGRACION_POWER_TOOLS.md
+CREAR_NUEVAS_SKILLS.md
+CLAUDE.md
+
+# docs: solo artefactos de proyecto quedan trackeados
+# Ignorar: datasets, enunciado, estado de flujo, reportes antiguos
+docs/00-requirements/
+docs/.flow-state.json
+docs/.factory-suggestions.md
+# Keep only latest audit reports (20260801-*.md)
+docs/.reviews/20260731-*.md
+docs/.reviews/202607312*.md
+docs/.reviews/20260801-0*.md
+docs/.reviews/20260801-1*.md
+docs/.reviews/20260801-2*.md
+# ── /Fabrica Agentica ──
