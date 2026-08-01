@@ -5,7 +5,7 @@ CRUD: listar, crear, actualizar rol, activar/desactivar.
 import uuid
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -90,6 +90,16 @@ async def update_user(
     if not user:
         raise NotFoundError("User", str(user_id))
 
+    if user.role == "admin" and user.is_active:
+        will_demote = body.role is not None and body.role != "admin"
+        will_deactivate = body.is_active is not None and not body.is_active
+        if will_demote or will_deactivate:
+            # BLOQUEO CONCURRENCIA FOR UPDATE
+            await db.execute(select(User.id).where(User.role == "admin", User.is_active == True).with_for_update())
+            admin_count = await db.execute(select(func.count(User.id)).where(User.role == "admin", User.is_active == True))
+            if admin_count.scalar() <= 1:
+                raise HTTPException(status_code=400, detail={"message": "No puede eliminar al último administrador"})
+
     old_values = {"role": user.role, "is_active": user.is_active}
 
     if body.role is not None:
@@ -126,3 +136,31 @@ async def users_summary(
         "active": active.scalar(),
         "admins": admins.scalar(),
     }
+
+
+@router.delete("/{user_id}", status_code=204)
+async def delete_user(
+    user_id: uuid.UUID,
+    current_user: dict = Depends(admin_required),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise NotFoundError("User", str(user_id))
+
+    if user.role == "admin" and user.is_active:
+        # BLOQUEO CONCURRENCIA FOR UPDATE
+        await db.execute(select(User.id).where(User.role == "admin", User.is_active == True).with_for_update())
+        admin_count = await db.execute(select(func.count(User.id)).where(User.role == "admin", User.is_active == True))
+        if admin_count.scalar() <= 1:
+            raise HTTPException(status_code=400, detail={"message": "No puede eliminar al último administrador"})
+            
+    await db.delete(user)
+    db.add(AuditLog(
+        entity_type="user",
+        entity_id=user.id,
+        action="DELETE",
+        changed_by=uuid.UUID(current_user["user_id"]),
+    ))
+    await db.commit()

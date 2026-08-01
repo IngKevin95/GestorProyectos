@@ -17,6 +17,7 @@ interface AdminState {
   fetchSummary: () => Promise<void>;
   createUser: (payload: UserCreate) => Promise<void>;
   updateUser: (id: string, payload: UserUpdate) => Promise<void>;
+  deleteUser: (id: string) => Promise<void>;
   fetchRoles: () => Promise<void>;
   fetchPermissions: () => Promise<void>;
   createRole: (payload: RoleCreate) => Promise<void>;
@@ -76,6 +77,20 @@ export const useAdminStore = create<AdminState>((set) => ({
     } catch (err: any) {
       const msg = err?.response?.data?.detail?.message ?? "Failed to update user";
       set({ error: msg, isLoading: false });
+      throw err;
+    }
+  },
+
+  deleteUser: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      await apiService.deleteUser(id);
+      const users = await apiService.getUsers();
+      const summary = await apiService.getUsersSummary();
+      set({ users, summary, isLoading: false });
+    } catch (err: any) {
+      const msg = err?.response?.data?.detail?.message ?? err?.response?.data?.detail ?? "Failed to delete user";
+      set({ error: typeof msg === 'string' ? msg : "Failed to delete user", isLoading: false });
       throw err;
     }
   },

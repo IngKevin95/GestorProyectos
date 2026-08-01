@@ -4,7 +4,7 @@ titulo: Gestión básica de usuarios y roles
 epica: EP-006
 prioridad: Should
 complejidad: M
-estado: borrador
+estado: lista
 ---
 
 # HU-016 — Gestión básica de usuarios y roles

@@ -246,6 +246,10 @@ export async function updateUser(id: string, payload: UserUpdate) {
   return data;
 }
 
+export async function deleteUser(id: string) {
+  await api.delete(`/users/${id}`);
+}
+
 export async function getUsersSummary() {
   const { data } = await api.get<UsersSummary>("/users/stats/summary");
   return data;
