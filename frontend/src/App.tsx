@@ -21,7 +21,6 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
   const [editingField, setEditingField] = useState<string | null>(null)
   const [filterStatus, setFilterStatus] = useState<string>('')
   const [filterResponsable, setFilterResponsable] = useState<string>('')
