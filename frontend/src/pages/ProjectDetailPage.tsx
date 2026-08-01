@@ -21,7 +21,7 @@ export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const t = useT();
-  const { selectedProject, isLoading, error, fetchProject, deleteProject } =
+  const { selectedProject, selectedKPI, isLoading, error, fetchProject, deleteProject } =
     useProjectStore();
 
   const [showEdit, setShowEdit] = useState(false);

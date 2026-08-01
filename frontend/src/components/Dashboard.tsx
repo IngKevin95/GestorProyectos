@@ -10,6 +10,7 @@ import * as svc from "../services/apiService";
 import type { ProjectTemplate } from "../types";
 import { useT } from "../hooks/useT";
 import { HealthBadge } from "./StatusBadge";
+import { PriorityPanel } from "./PriorityPanel";
 
 export function Dashboard() {
   const { projects, selectedProject, fetchProjects, fetchProject, deleteProject, isLoading } = useProjectStore();
@@ -199,8 +200,20 @@ export function Dashboard() {
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                 </Link>
               </div>
-              {/* the rest of KPI content goes here in actual implementation */}
-              <div className="p-12 border-2 border-dashed border-slate-100 rounded-2xl flex flex-col items-center justify-center bg-slate-50/50">
+
+              {/* Priority Panel */}
+              <div className="mt-4">
+                <PriorityPanel
+                  strategy={(selectedProject.priority_strategy as "relative" | "absolute" | "mixed") || "relative"}
+                  priority_constant={selectedProject.priority_constant as number}
+                  business_value={selectedProject.business_value as number}
+                  health_status={(selectedProject.health_status as "ok" | "blocked" | "at_risk" | "no_next_step") || "ok"}
+                  score={selectedProject.score as number || 0}
+                />
+              </div>
+
+              {/* KPI content placeholder */}
+              <div className="p-12 border-2 border-dashed border-slate-100 rounded-2xl flex flex-col items-center justify-center bg-slate-50/50 mt-4">
                 <p className="text-slate-400 font-medium">Las métricas KPI del proyecto se mostrarán aquí.</p>
               </div>
             </div>
@@ -226,6 +239,7 @@ export function Dashboard() {
 function CreateProjectModal({ onClose }: Readonly<{ onClose: () => void }>) {
   const t = useT();
   const [name, setName] = useState("");
+  const [responsable, setResponsable] = useState("");
   const [bac, setBac] = useState("");
   const [priorityStrategy, setPriorityStrategy] = useState("relative");
   const [businessValue, setBusinessValue] = useState("");
@@ -242,7 +256,7 @@ function CreateProjectModal({ onClose }: Readonly<{ onClose: () => void }>) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const bacNum = Number.parseFloat(bac);
-    if (!name.trim() || Number.isNaN(bacNum) || bacNum <= 0) {
+    if (!name.trim() || !responsable.trim() || Number.isNaN(bacNum) || bacNum <= 0) {
       setError(t("dashboard.name_required"));
       return;
     }
@@ -250,6 +264,7 @@ function CreateProjectModal({ onClose }: Readonly<{ onClose: () => void }>) {
     try {
       const projectPayload = {
         name: name.trim(),
+        responsable: responsable.trim(),
         bac: bacNum,
         priority_strategy: priorityStrategy,
         business_value: Number.parseFloat(businessValue) || 0,
@@ -302,6 +317,17 @@ function CreateProjectModal({ onClose }: Readonly<{ onClose: () => void }>) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder={t("dashboard.name_placeholder")}
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="project-responsable" className="block text-sm font-bold text-slate-700 mb-1.5">Responsable</label>
+            <input
+              id="project-responsable"
+              className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all font-medium"
+              value={responsable}
+              onChange={(e) => setResponsable(e.target.value)}
+              placeholder="Nombre del responsable"
               required
             />
           </div>

@@ -1,5 +1,6 @@
 /* API service — all backend endpoints centralised. */
 import api from "./api";
+export { api };
 import type {
   Project,
   Phase,
