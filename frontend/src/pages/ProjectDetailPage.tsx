@@ -37,7 +37,7 @@ export function ProjectDetailPage() {
   const handleDelete = async () => {
     if (!selectedProject) return;
     await deleteProject(selectedProject.id);
-    showToast("Project deleted", "success");
+    showToast("Proyecto eliminado", "success");
     navigate("/dashboard", { replace: true });
   };
 
@@ -71,10 +71,10 @@ export function ProjectDetailPage() {
     <Layout>
       <div className="max-w-6xl mx-auto px-6 py-8 space-y-6">
         {/* Breadcrumb */}
-        <nav className="text-sm text-gray-500">
-          <Link to="/dashboard" className="hover:underline">Dashboard</Link>
-          <span className="mx-2">/</span>
-          <span className="text-gray-800 font-medium">{project.name}</span>
+        <nav className="text-sm text-slate-500" aria-label="Migas de pan">
+          <Link to="/dashboard" className="hover:text-slate-700 font-medium transition-colors">Dashboard</Link>
+          <span className="mx-2 text-slate-300" aria-hidden="true">/</span>
+          <span className="text-slate-700 font-semibold">{project.name}</span>
         </nav>
 
         {/* Header */}
@@ -113,34 +113,20 @@ export function ProjectDetailPage() {
           </div>
         </div>
 
-        {/* Tabs */}
+        {/* Tabs — solo se muestra Auditoría hasta que Tareas esté disponible */}
         <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
-          {([
-            ["tasks", "Tareas"],
-            ["audit", t("project.audit")],
-          ] satisfies [TabId, string][]).map(([tab, label]) => (
-            <button
-              key={tab}
-              type="button"
-              onClick={() => setActiveTab(tab as TabId)}
-              className={`px-4 py-2 text-sm rounded-lg font-bold transition-all ${activeTab === tab ? "bg-white shadow-sm text-indigo-700" : "text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"}`}
-            >
-              {label}
-            </button>
-          ))}
+          <button
+            type="button"
+            onClick={() => setActiveTab("audit")}
+            className={`px-4 py-2 text-sm rounded-lg font-semibold transition-all ${activeTab === "audit" ? "bg-white shadow-sm text-indigo-700" : "text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"}`}
+          >
+            {t("project.audit")}
+          </button>
         </div>
 
         {/* Tab content */}
-        {activeTab === "tasks" && (
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="text-center py-12 text-slate-400">
-              <p className="text-sm">Gestión de tareas disponible próximamente</p>
-            </div>
-          </div>
-        )}
-
         {activeTab === "audit" && (
-          <div className="bg-white rounded-xl shadow p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
             <AuditTrail projectId={project.id} />
           </div>
         )}
@@ -191,10 +177,10 @@ function StateChangeModal({ projectId, currentState, version, allowed, onClose, 
     setSaving(true);
     try {
       await updateProject(projectId, { state: selected, version });
-      showToast(`State: ${currentState} → ${selected}`, "success");
+      showToast("Estado actualizado correctamente", "success");
       onChanged();
     } catch {
-      showToast("Failed to change state", "error");
+      showToast("Error al cambiar el estado", "error");
     } finally {
       setSaving(false);
     }

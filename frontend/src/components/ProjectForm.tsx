@@ -43,6 +43,7 @@ export function ProjectForm({ open, project, onSubmit, onClose, isLoading }: Pro
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const priorityStrategiesRequiringConstant = ["absolute"];
 
@@ -86,7 +87,6 @@ export function ProjectForm({ open, project, onSubmit, onClose, isLoading }: Pro
       if (priorityStrategiesRequiringConstant.includes(formData.priority_strategy)) {
         payload.priority_constant = formData.priority_constant;
       }
-      console.log("Submitting:", payload);
       await onSubmit(payload);
       setFormData({
         nombre: "",
@@ -109,7 +109,204 @@ export function ProjectForm({ open, project, onSubmit, onClose, isLoading }: Pro
 
   return (
     <Modal open={open} onClose={onClose} title={project ? "Editar Proyecto" : "Nuevo Proyecto"} wide>
-      <form onSubmit={handleSubmit} className="space-y-5 max-h-[70vh] overflow-y-auto">
+      <form onSubmit={handleSubmit} className="space-y-5 max-h-[72vh] overflow-y-auto pr-1">
+
+        {/* ── Sección básica ── */}
+        <div className="space-y-4">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Información básica</p>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nombre *</label>
+            <input
+              type="text"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+              value={formData.nombre}
+              onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+              placeholder="Nombre del proyecto"
+            />
+            {errors.nombre && <p className="text-red-500 text-xs mt-1 font-medium">{errors.nombre}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Responsable *</label>
+            <input
+              type="text"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+              value={formData.responsable}
+              onChange={(e) => setFormData({ ...formData, responsable: e.target.value })}
+              placeholder="Nombre del responsable"
+            />
+            {errors.responsable && <p className="text-red-500 text-xs mt-1 font-medium">{errors.responsable}</p>}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Tipo de Proyecto</label>
+              <select
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all appearance-none"
+                value={formData.tipo_proyecto}
+                onChange={(e) => setFormData({ ...formData, tipo_proyecto: e.target.value })}
+              >
+                {TIPOS.map((tipo) => (
+                  <option key={tipo} value={tipo}>{tipo}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Prioridad</label>
+              <select
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all appearance-none"
+                value={formData.prioridad}
+                onChange={(e) => setFormData({ ...formData, prioridad: e.target.value })}
+              >
+                {PRIORIDADES.map((prioridad) => (
+                  <option key={prioridad} value={prioridad}>{prioridad}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Estado</label>
+              <select
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all appearance-none"
+                value={formData.estado}
+                onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+              >
+                {ESTADOS.map((estado) => (
+                  <option key={estado} value={estado}>{estado}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Fecha Límite</label>
+              <input
+                type="date"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+                value={formData.fecha_limite}
+                onChange={(e) => setFormData({ ...formData, fecha_limite: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Siguiente Paso</label>
+            <input
+              type="text"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+              value={formData.siguiente_paso}
+              onChange={(e) => setFormData({ ...formData, siguiente_paso: e.target.value })}
+              placeholder="¿Cuál es el siguiente paso?"
+            />
+          </div>
+        </div>
+
+        {/* ── Sección contexto ── */}
+        <div className="space-y-4">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Contexto (opcional)</p>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Bloqueos</label>
+            <textarea
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all resize-none"
+              rows={2}
+              value={formData.bloqueos}
+              onChange={(e) => setFormData({ ...formData, bloqueos: e.target.value })}
+              placeholder="¿Hay algo que bloquea este proyecto?"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Notas</label>
+            <textarea
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all resize-none"
+              rows={2}
+              value={formData.notas}
+              onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
+              placeholder="Notas adicionales"
+            />
+          </div>
+        </div>
+
+        {/* ── Sección avanzada (colapsable) ── */}
+        <div className="border-t border-slate-100 pt-4">
+          <button
+            type="button"
+            className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors w-full"
+            onClick={() => setShowAdvanced((v) => !v)}
+          >
+            <svg
+              className={`w-4 h-4 transition-transform ${showAdvanced ? "rotate-90" : ""}`}
+              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+            Configuración avanzada de priorización
+          </button>
+
+          {showAdvanced && (
+            <div className="mt-4 space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Estrategia de Priorización</label>
+                <select
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all appearance-none"
+                  value={formData.priority_strategy}
+                  onChange={(e) => setFormData({ ...formData, priority_strategy: e.target.value })}
+                >
+                  <option value="relative">Relativa (Urgencia × Valor)</option>
+                  <option value="absolute">Absoluta (Fija)</option>
+                  <option value="mixed">Mixta (Salud + Urgencia + Valor + Críticas)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Constante de Prioridad</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  disabled={!priorityStrategiesRequiringConstant.includes(formData.priority_strategy)}
+                  className={`w-full rounded-xl px-4 py-3 text-sm transition-all ${
+                    priorityStrategiesRequiringConstant.includes(formData.priority_strategy)
+                      ? "bg-white border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
+                      : "bg-slate-50 border border-slate-100 text-slate-400 cursor-not-allowed"
+                  }`}
+                  value={formData.priority_constant}
+                  onChange={(e) => setFormData({ ...formData, priority_constant: parseInt(e.target.value) || 0 })}
+                  placeholder="0 – 100"
+                />
+                <p className="text-xs text-slate-400 mt-1.5 font-medium">
+                  {priorityStrategiesRequiringConstant.includes(formData.priority_strategy)
+                    ? "Valor fijo de prioridad entre 0 y 100. Solo disponible para estrategia Absoluta."
+                    : "Solo disponible cuando la estrategia es Absoluta."}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-end gap-3 pt-2 border-t border-slate-100">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 text-sm rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors font-medium"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="px-5 py-2 text-sm rounded-lg text-white font-semibold bg-indigo-600 hover:bg-indigo-700 transition-colors disabled:opacity-50 shadow-sm"
+          >
+            {isLoading ? "Guardando..." : project ? "Actualizar" : "Crear proyecto"}
+          </button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
         <div>
           <label className="block text-base font-bold text-slate-700 mb-2">Nombre *</label>
           <input
