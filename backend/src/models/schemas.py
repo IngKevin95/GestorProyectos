@@ -253,6 +253,7 @@ class ProjectResponse(BaseModel):
     bloqueos: Optional[str] = None
     notas: Optional[str] = None
     tipo_proyecto: Optional[ProjectType] = None
+    health_status: str = "ok"  # EP-002: ok, blocked, at_risk, no_next_step
     user_id: uuid.UUID
     version: int
     created_at: datetime

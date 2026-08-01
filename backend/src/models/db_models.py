@@ -86,6 +86,12 @@ class Project(Base):
     bloqueos: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
     notas: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     tipo_proyecto: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)  # Mantenimiento, Recurrente, Diagnóstico, Proyecto
+    # Health detection (EP-002)
+    health_status: Mapped[str] = mapped_column(
+        Enum("ok", "blocked", "at_risk", "no_next_step", name="project_health_status"),
+        nullable=False,
+        default="ok"
+    )
     # ---
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey(_FK_USERS_ID), nullable=False)
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

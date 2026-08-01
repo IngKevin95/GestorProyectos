@@ -19,6 +19,7 @@ from src.models.schemas import (
     ProjectUpdate,
 )
 from src.services.evm_calculator import ActivityInput, consolidate_evm
+from src.services.health_detection_service import HealthDetectionService
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
@@ -62,6 +63,10 @@ async def create_project(
         tipo_proyecto=body.tipo_proyecto,
         user_id=uuid.UUID(current_user["user_id"])
     )
+
+    # EP-002: Evaluate health status on creation
+    HealthDetectionService.update_project_health(project)
+
     db.add(project)
     await db.flush()
     db.add(AuditLog(
@@ -74,7 +79,8 @@ async def create_project(
             "bac": float(body.bac),
             "responsable": body.responsable,
             "estado": body.estado,
-            "tipo_proyecto": body.tipo_proyecto
+            "tipo_proyecto": body.tipo_proyecto,
+            "health_status": project.health_status
         },
         changed_by=uuid.UUID(current_user["user_id"])
     ))
@@ -185,14 +191,18 @@ async def update_project(
     if body.tipo_proyecto is not None:
         project.tipo_proyecto = body.tipo_proyecto
 
+    # EP-002: Re-evaluate health status on update
+    old_health = project.health_status
+    HealthDetectionService.update_project_health(project)
+
     project.version += 1
     db.add(AuditLog(
         project_id=project.id,
         entity_type="project",
         entity_id=project.id,
         action="UPDATE",
-        old_value={"state": old_state},
-        new_value={"state": project.state, "status": project.status, "siguiente_paso": project.siguiente_paso},
+        old_value={"state": old_state, "health_status": old_health},
+        new_value={"state": project.state, "status": project.status, "siguiente_paso": project.siguiente_paso, "health_status": project.health_status},
         changed_by=uuid.UUID(current_user["user_id"])
     ))
     await db.commit()
@@ -233,3 +243,36 @@ async def get_project_evm(
     activities = await _get_all_activities(db, project_id)
     evm = consolidate_evm(activities)
     return EVMResponse(**evm.__dict__)
+
+
+@router.get("/{project_id}/health", response_model=dict)
+async def get_project_health(
+    project_id: uuid.UUID,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Evaluate and return project health status (EP-002).
+
+    Health classification rules:
+    - BLOCKED: Has blockers OR overdue_tasks >= 3
+    - AT_RISK: target_date <= 7 days AND open_tasks > 0
+    - NO_NEXT_STEP: siguiente_paso is empty or whitespace
+    - OK: None of the above
+    """
+    result = await db.execute(select(Project).where(Project.id == project_id, Project.deleted_at == None))
+    project = result.scalar_one_or_none()
+    if not project:
+        raise NotFoundError("Project", str(project_id))
+    _check_rls(project, current_user["user_id"])
+
+    # Evaluate health (placeholder: no task integration yet)
+    # TODO: Query overdue_tasks and open_tasks from Tasks table once EP-004 is complete
+    health_result = HealthDetectionService.detect_health(project, overdue_tasks_count=0, open_tasks_count=0)
+
+    return {
+        "project_id": str(project_id),
+        "status": health_result["status"],
+        "evidence": health_result["evidence"],
+        "details": health_result["details"],
+    }

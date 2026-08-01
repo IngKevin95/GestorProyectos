@@ -4,7 +4,7 @@ titulo: Detectar automáticamente proyectos sin siguiente paso claro
 epica: EP-002
 prioridad: Must
 complejidad: S
-estado: borrador
+estado: lista
 ---
 
 # HU-006 — Detectar automáticamente proyectos sin siguiente paso claro
