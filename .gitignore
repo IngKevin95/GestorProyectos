@@ -216,3 +216,48 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ── factory-vertical (auto) ───────────────────────────
+.claude/skills/factory/
+.claude/agents/factory/
+.claude/hooks/factory.json
+.claude/.factory-version
+docs/.flow-state.json
+docs/.factory-suggestions.md
+# docs/.reviews/ now includes audit reports — tracked selectively
+# ── /factory-vertical ─────────────────────────────────
+
+# ── factory-arch-vertical (auto) ───────────────────────
+.claude/skills/factory-arch/
+.claude/agents/factory-arch/
+.claude/hooks/arch.json
+.claude/.arch-version
+docs/.arch-flow-state.json
+docs/.arch-suggestions.md
+# docs/.reviews/ now includes audit reports — tracked selectively
+# ── /factory-arch-vertical ─────────────────────────────
+
+# ── factory-build-harness (auto) ───────────────────────
+.claude/state/build-state.json
+# ── /factory-build-harness ──────────────────────
+
+# ── Fabrica Agentica: artefactos internos (no forman parte del reto) ──
+.claude/*
+.agents/
+.claudeignore
+node_modules/
+package.json
+package-lock.json
+.code-review-graph/
+*.tgz
+install-factories.ps1
+release-factories.ps1
+rename_*.ps1
+INTEGRACION_POWER_TOOLS.md
+CREAR_NUEVAS_SKILLS.md
+CLAUDE.md
+
+# docs: solo el PRD queda trackeado, el resto (datasets, enunciado, estado de flujo) se ignora
+# docs/*
+# ── /Fabrica Agentica ──
+docs/00-requirements/Enunciado — Reto Desarrollador de Soluciones con IA _ Aztec.md
