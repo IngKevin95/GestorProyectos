@@ -40,9 +40,21 @@ function useRolePermissions(initial: string[] = []) {
 
 export function AdminPage() {
   const { user } = useAuthStore();
-  const { users, summary, roles, isLoading, error, fetchUsers, fetchSummary, fetchRoles, fetchPermissions, clearError } = useAdminStore();
+  const { users, summary, roles, isLoading, error, fetchUsers, fetchSummary, fetchRoles, fetchPermissions, clearError, deleteUser } = useAdminStore();
   const [showCreate, setShowCreate] = useState(false);
   const [editUser, setEditUser] = useState<UserWithStatus | null>(null);
+  const [confirmDeleteUser, setConfirmDeleteUser] = useState<UserWithStatus | null>(null);
+
+  const handleDeleteUser = async () => {
+    if (!confirmDeleteUser) return;
+    try {
+      await deleteUser(confirmDeleteUser.id);
+      showToast("Usuario eliminado", "success");
+      setConfirmDeleteUser(null);
+    } catch {
+      setConfirmDeleteUser(null);
+    }
+  };
   const [showCreateRole, setShowCreateRole] = useState(false);
   const [editRole, setEditRole] = useState<Role | null>(null);
   const [tab, setTab] = useState<"users" | "roles">("users");
@@ -114,13 +126,35 @@ export function AdminPage() {
 
         {/* Content */}
         {tab === "users" && (
-          <UsersTable users={users} isLoading={isLoading} currentUserId={user.id} onEdit={setEditUser} roles={roles} />
+          <UsersTable users={users} isLoading={isLoading} currentUserId={user.id} onEdit={setEditUser} onDelete={setConfirmDeleteUser} roles={roles} />
         )}
         {tab === "roles" && <RolesPanel roles={roles} onCreateRole={() => setShowCreateRole(true)} onEditRole={setEditRole} />}
       </div>
 
       {showCreate && <CreateUserModal onClose={() => setShowCreate(false)} roles={roles} />}
       {editUser && <EditUserModal user={editUser} onClose={() => setEditUser(null)} currentUserId={user.id} roles={roles} />}
+      {confirmDeleteUser && (
+        <Modal open title="Eliminar Usuario" onClose={() => setConfirmDeleteUser(null)}>
+          <div className="p-6 space-y-4">
+            <h3 className="text-lg font-bold text-gray-900">Eliminar Usuario</h3>
+            <p className="text-sm text-gray-600">
+              ¿Estás seguro de que deseas eliminar el usuario <strong>{confirmDeleteUser.email}</strong>?
+            </p>
+            <div className="flex gap-3 pt-2">
+              <button type="button" className="flex-1 px-4 py-2.5 rounded-lg border text-sm hover:bg-gray-50" onClick={() => setConfirmDeleteUser(null)}>
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="flex-1 px-4 py-2.5 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700"
+                onClick={handleDeleteUser}
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
       {showCreateRole && <CreateRoleModal onClose={() => setShowCreateRole(false)} />}
       {editRole && <EditRoleModal role={editRole} onClose={() => setEditRole(null)} />}
       <ToastContainer />
@@ -176,11 +210,12 @@ function TabButton({ active, onClick, children }: Readonly<{ active: boolean; on
 
 /* ── Users Table ──────────────────────────────── */
 
-function UsersTable({ users, isLoading, currentUserId, onEdit, roles }: Readonly<{
+function UsersTable({ users, isLoading, currentUserId, onEdit, onDelete, roles }: Readonly<{
   users: UserWithStatus[];
   isLoading: boolean;
   currentUserId: string;
   onEdit: (u: UserWithStatus) => void;
+  onDelete: (u: UserWithStatus) => void;
   roles: Role[];
 }>) {
   if (isLoading) {
@@ -242,13 +277,25 @@ function UsersTable({ users, isLoading, currentUserId, onEdit, roles }: Readonly
                 <button
                   type="button"
                   onClick={() => onEdit(u)}
-                  className="text-gray-400 hover:text-gray-700 transition p-1"
+                  className="text-gray-400 hover:text-gray-700 transition p-1 inline-block"
                   title="Editar usuario"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                 </button>
+                {u.id !== currentUserId && (
+                  <button
+                    type="button"
+                    onClick={() => onDelete(u)}
+                    className="text-gray-400 hover:text-red-600 transition p-1 inline-block ml-2"
+                    title="Eliminar usuario"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                )}
               </td>
             </tr>
           ))}
