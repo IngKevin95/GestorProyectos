@@ -9,9 +9,10 @@ import { formatCurrency } from "../utils/format";
 import * as svc from "../services/apiService";
 import type { ProjectTemplate } from "../types";
 import { useT } from "../hooks/useT";
+import { HealthBadge } from "./StatusBadge";
 
 export function Dashboard() {
-  const { projects, selectedProject, selectedKPI, fetchProjects, fetchProject, deleteProject, isLoading } = useProjectStore();
+  const { projects, selectedProject, fetchProjects, fetchProject, deleteProject, isLoading } = useProjectStore();
   const [showCreate, setShowCreate] = useState(false);
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -37,6 +38,20 @@ export function Dashboard() {
     PAUSED: "bg-amber-500/10 text-amber-700 border-amber-500/20",
     COMPLETED: "bg-slate-500/10 text-slate-700 border-slate-500/20",
     CANCELLED: "bg-rose-500/10 text-rose-700 border-rose-500/20",
+  };
+
+  const healthColor: Record<string, string> = {
+    ok: "bg-green-100 text-green-700 border-green-200",
+    blocked: "bg-red-100 text-red-700 border-red-200",
+    at_risk: "bg-orange-100 text-orange-700 border-orange-200",
+    no_next_step: "bg-gray-100 text-gray-700 border-gray-200",
+  };
+
+  const healthLabel: Record<string, string> = {
+    ok: "Saludable",
+    blocked: "Bloqueado",
+    at_risk: "En Riesgo",
+    no_next_step: "Sin Siguiente Paso",
   };
 
   return (
@@ -98,6 +113,9 @@ export function Dashboard() {
               <div className="flex items-center justify-between mb-2">
                 <span className="font-bold text-slate-800 truncate text-base">{project.name}</span>
                 <div className="flex items-center gap-2">
+                  {project.health_status && (
+                    <HealthBadge health_status={project.health_status as any} />
+                  )}
                   <span className={`text-xs px-2.5 py-1 rounded-lg font-bold border ${stateColor[project.state] ?? "bg-slate-50 border-slate-200 text-slate-500"}`}>
                     {project.state}
                   </span>
@@ -145,9 +163,15 @@ export function Dashboard() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2 text-sm text-slate-500 font-medium">
-                <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                BAC: {formatCurrency(project.bac)}
+              <div className="flex items-center justify-between text-sm text-slate-500 font-medium mt-2">
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  BAC: {formatCurrency(project.bac)}
+                </div>
+                <div className="flex items-center gap-1 font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                  {project.score !== null ? project.score.toFixed(2) : "0.00"}
+                </div>
               </div>
             </button>
           ))}
@@ -200,10 +224,12 @@ export function Dashboard() {
 }
 
 function CreateProjectModal({ onClose }: Readonly<{ onClose: () => void }>) {
-  const { createProject } = useProjectStore();
   const t = useT();
   const [name, setName] = useState("");
   const [bac, setBac] = useState("");
+  const [priorityStrategy, setPriorityStrategy] = useState("relative");
+  const [businessValue, setBusinessValue] = useState("");
+  const [priorityConstant, setPriorityConstant] = useState("");
   const [error, setError] = useState("");
   const [templates, setTemplates] = useState<ProjectTemplate[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
@@ -222,7 +248,17 @@ function CreateProjectModal({ onClose }: Readonly<{ onClose: () => void }>) {
     }
     setApplying(true);
     try {
-      const project = await createProject(name.trim(), bacNum);
+      const projectPayload = {
+        name: name.trim(),
+        bac: bacNum,
+        priority_strategy: priorityStrategy,
+        business_value: Number.parseFloat(businessValue) || 0,
+        priority_constant: Number.parseFloat(priorityConstant) || 0,
+      };
+      
+      const res = await svc.api.post("/projects", projectPayload);
+      const project = res.data;
+      useProjectStore.getState().fetchProjects();
 
       // Apply template if selected
       const tpl = templates.find((t) => t.id === selectedTemplate);
@@ -288,6 +324,49 @@ function CreateProjectModal({ onClose }: Readonly<{ onClose: () => void }>) {
               />
             </div>
           </div>
+          <div>
+            <label htmlFor="priority-strategy" className="block text-sm font-bold text-slate-700 mb-1.5">Estrategia de Prioridad</label>
+            <select
+              id="priority-strategy"
+              className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all font-medium appearance-none"
+              value={priorityStrategy}
+              onChange={(e) => setPriorityStrategy(e.target.value)}
+            >
+              <option value="relative">Relativa (Urgencia x Valor)</option>
+              <option value="absolute">Absoluta (Fija)</option>
+              <option value="mixed">Mixta (Salud + Urgencia + Valor + Críticas)</option>
+            </select>
+          </div>
+          {priorityStrategy === "absolute" && (
+            <div>
+              <label htmlFor="priority-constant" className="block text-sm font-bold text-slate-700 mb-1.5">Score Constante</label>
+              <input
+                id="priority-constant"
+                type="number"
+                step="0.01"
+                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all font-medium"
+                value={priorityConstant}
+                onChange={(e) => setPriorityConstant(e.target.value)}
+                placeholder="Ej. 100"
+              />
+            </div>
+          )}
+          {priorityStrategy !== "absolute" && (
+            <div>
+              <label htmlFor="business-value" className="block text-sm font-bold text-slate-700 mb-1.5">Valor de Negocio (0-10)</label>
+              <input
+                id="business-value"
+                type="number"
+                min="0"
+                max="10"
+                step="0.1"
+                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all font-medium"
+                value={businessValue}
+                onChange={(e) => setBusinessValue(e.target.value)}
+                placeholder="Ej. 8.5"
+              />
+            </div>
+          )}
           {/* Template selector */}
           {templates.length > 0 && (
             <div>
